@@ -409,6 +409,41 @@
   .hot-text p{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .hot-go{font-size:10px;font-weight:700;color:var(--acc);background:#fff;padding:4px 10px;border-radius:8px;flex-shrink:0;}
 
+  /* ═══════ HOT CHART ═══════ */
+  .hot-chart{margin:0 14px 14px;background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;}
+  .hot-chart-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;}
+  .hot-chart-title{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;color:var(--text);}
+  .hot-chart-title .hc-fire{font-size:16px;}
+  .hot-chart-time{font-size:10px;color:var(--sub);font-weight:500;}
+  .hot-chart-list{list-style:none;margin:0;padding:0;}
+  .hot-chart-item{
+    display:flex;align-items:center;gap:10px;padding:11px 16px;
+    border-top:1px solid var(--border);cursor:pointer;transition:background .15s;
+  }
+  .hot-chart-item:active{background:var(--bg);}
+  .hot-chart-rank{
+    width:22px;font-size:15px;font-weight:900;color:var(--text);text-align:center;flex-shrink:0;
+  }
+  .hot-chart-item:nth-child(1) .hot-chart-rank{color:var(--acc);}
+  .hot-chart-item:nth-child(2) .hot-chart-rank{color:var(--pri);}
+  .hot-chart-item:nth-child(3) .hot-chart-rank{color:var(--warm);}
+  .hot-chart-change{
+    width:20px;font-size:9px;font-weight:700;text-align:center;flex-shrink:0;line-height:1;
+  }
+  .hot-chart-change.up{color:#E07A5F;}
+  .hot-chart-change.down{color:#7EAED4;}
+  .hot-chart-change.same{color:var(--sub);}
+  .hot-chart-change.new{color:var(--acc);font-size:8px;font-weight:800;}
+  .hot-chart-body{flex:1;min-width:0;}
+  .hot-chart-body p{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;}
+  .hot-chart-body .hc-meta{font-size:10px;color:var(--sub);display:flex;gap:8px;}
+  .hot-chart-body .hc-meta span{display:flex;align-items:center;gap:2px;}
+  .hot-chart-body .hc-meta svg{width:10px;height:10px;}
+  .hot-chart-score{
+    font-size:9px;font-weight:700;color:var(--warm);background:#FBF5F0;
+    padding:3px 7px;border-radius:6px;flex-shrink:0;white-space:nowrap;
+  }
+
   /* ═══════ 별똥별마켓 SCREEN ═══════ */
   .std-header{
     padding:14px 18px 10px;background:#fff;
@@ -1224,6 +1259,14 @@
   .app.secret-mode .nav-btn.active{color:#C8956C;}
   .app.secret-mode .online-bar{background:#3D3229;color:#7A6858;}
   .app.secret-mode .online-bar b{color:#C8956C;}
+  .app.secret-mode .hot-chart{background:#3D3229;border-color:#5C4A3A;}
+  .app.secret-mode .hot-chart-title{color:#E8DDD4;}
+  .app.secret-mode .hot-chart-time{color:#7A6858;}
+  .app.secret-mode .hot-chart-item{border-color:#5C4A3A;}
+  .app.secret-mode .hot-chart-rank{color:#E8DDD4;}
+  .app.secret-mode .hot-chart-body p{color:#E8DDD4;}
+  .app.secret-mode .hot-chart-body .hc-meta{color:#7A6858;}
+  .app.secret-mode .hot-chart-score{background:#2A2320;color:#C8956C;}
 
   /* ═══════ 온보딩 ═══════ */
   .onboarding{
@@ -1566,21 +1609,34 @@
 
       <!-- ═══ 인기 탭 ═══ -->
       <div class="comm-tab-content" id="comm-popular">
-        <div style="padding:12px 14px 6px;font-size:11px;color:var(--sub);">최근 24시간 인기글</div>
+
+        <!-- ── 실시간 HOT 차트 ── -->
+        <div class="hot-chart" id="hotChart">
+          <div class="hot-chart-header">
+            <div class="hot-chart-title"><span class="hc-fire">🔥</span> 실시간 HOT</div>
+            <div class="hot-chart-time">최근 24시간 기준</div>
+          </div>
+          <ol class="hot-chart-list" id="hotChartList">
+            <!-- JS가 렌더링 -->
+          </ol>
+        </div>
+
+        <!-- ── 인기글 피드 ── -->
+        <div style="padding:4px 14px 6px;font-size:11px;color:var(--sub);font-weight:600;">인기글 피드</div>
         <div class="post">
           <div class="post-head"><div class="p-avatar g4">🌸</div><div><div class="p-name">지우맘 <span class="popular-badge">인기</span></div><div class="p-badges"><span class="p-tier t1">새싹맘</span> <span class="p-meta">3개월 · 5시간 전</span></div></div><div class="p-more" onclick="event.stopPropagation();showPostMenu()">⋯</div></div>
           <div class="p-body">배앓이가 너무 심해요 😭<br>가스 찬 것 같은데 어떻게 해주시나요?<br><span class="tag">#배앓이 #3개월아기</span></div>
-          <div class="reactions"><button class="react-btn on" onclick="toggleReact(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="rc">80</div><div class="rl">좋아요</div></button><button class="react-btn" onclick="openPostDetail(this.closest('.post'))"><div class="ri"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="rc">22</div><div class="rl">댓글</div></button><button class="react-btn" onclick="sharePost(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="rc"></div><div class="rl">공유</div></button></div>
+          <div class="reactions"><button class="react-btn on" onclick="toggleReact(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="rc">156</div><div class="rl">좋아요</div></button><button class="react-btn" onclick="openPostDetail(this.closest('.post'))"><div class="ri"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="rc">47</div><div class="rl">댓글</div></button><button class="react-btn" onclick="sharePost(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="rc"></div><div class="rl">공유</div></button></div>
         </div>
         <div class="post">
           <div class="post-head"><div class="p-avatar g3">🦊</div><div><div class="p-name">민준맘 <span class="popular-badge">인기</span></div><div class="p-badges"><span class="p-tier t3">인증단</span> <span class="p-meta">24개월 · 어제</span></div></div><div class="p-more" onclick="event.stopPropagation();showPostMenu()">⋯</div></div>
           <div class="p-body">두돌 지나니까 말이 갑자기 트이네요 🤩<br>어제 처음으로 "엄마 사랑해" 했는데 울 뻔 ㅠㅠ<br><span class="tag">#두돌아기 #언어발달</span></div>
-          <div class="reactions"><button class="react-btn on" onclick="toggleReact(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="rc">72</div><div class="rl">좋아요</div></button><button class="react-btn" onclick="openPostDetail(this.closest('.post'))"><div class="ri"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="rc">34</div><div class="rl">댓글</div></button><button class="react-btn" onclick="sharePost(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="rc"></div><div class="rl">공유</div></button></div>
+          <div class="reactions"><button class="react-btn on" onclick="toggleReact(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="rc">98</div><div class="rl">좋아요</div></button><button class="react-btn" onclick="openPostDetail(this.closest('.post'))"><div class="ri"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="rc">32</div><div class="rl">댓글</div></button><button class="react-btn" onclick="sharePost(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="rc"></div><div class="rl">공유</div></button></div>
         </div>
         <div class="post">
           <div class="post-head"><div class="p-avatar g2">👶</div><div><div class="p-name">서연맘 <span class="popular-badge">인기</span></div><div class="p-badges"><span class="p-tier t2">별똥별맘</span> <span class="p-meta">6개월 · 4시간 전</span></div></div><div class="p-more" onclick="event.stopPropagation();showPostMenu()">⋯</div></div>
           <div class="p-body">6개월 이유식 시작했는데 쌀미음부터 하고 있어요 🍚<br>다들 이유식 언제 시작하셨나요?<br><span class="tag">#이유식시작 #6개월아기</span></div>
-          <div class="reactions"><button class="react-btn on" onclick="toggleReact(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="rc">45</div><div class="rl">좋아요</div></button><button class="react-btn" onclick="openPostDetail(this.closest('.post'))"><div class="ri"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="rc">15</div><div class="rl">댓글</div></button><button class="react-btn" onclick="sharePost(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="rc"></div><div class="rl">공유</div></button></div>
+          <div class="reactions"><button class="react-btn on" onclick="toggleReact(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="rc">87</div><div class="rl">좋아요</div></button><button class="react-btn" onclick="openPostDetail(this.closest('.post'))"><div class="ri"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="rc">28</div><div class="rl">댓글</div></button><button class="react-btn" onclick="sharePost(this)"><div class="ri"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="rc"></div><div class="rl">공유</div></button></div>
         </div>
       </div>
 
@@ -1590,6 +1646,7 @@
           <div class="topic-card"><div class="tc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12V5c0-1.1.9-2 2-2h1a2 2 0 0 1 2 2v1"/><path d="M11 6V3a2 2 0 0 1 4 0v7"/><path d="M15 5V3a2 2 0 0 1 4 0v8a8 8 0 0 1-16 0V9a2 2 0 0 1 4 0"/></svg></div><div class="tc-name">수유/이유식</div><div class="tc-count">글 342개</div></div>
           <div class="topic-card"><div class="tc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></div><div class="tc-name">수면/밤잠</div><div class="tc-count">글 256개</div></div>
           <div class="topic-card"><div class="tc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M12 17v5"/><path d="M6 9a6 6 0 0 0 12 0"/><rect x="6" y="4" width="12" height="5" rx="2"/></svg></div><div class="tc-name">육아템 추천</div><div class="tc-count">글 489개</div></div>
+          <div class="topic-card"><div class="tc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div><div class="tc-name">육아템 나눔</div><div class="tc-count">글 312개</div></div>
           <div class="topic-card"><div class="tc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div><div class="tc-name">발달/성장</div><div class="tc-count">글 198개</div></div>
           <div class="topic-card"><div class="tc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div><div class="tc-name">건강/병원</div><div class="tc-count">글 167개</div></div>
           <div class="topic-card"><div class="tc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4"/><path d="M14 12h.01"/><path d="M18 12h.01"/></svg></div><div class="tc-name">놀이/교육</div><div class="tc-count">글 231개</div></div>
@@ -4483,6 +4540,57 @@ document.getElementById('s-info').addEventListener('click', function(e){
   openInfoDetail(title);
 });
 
+// ─── HOT 차트 렌더링 ───
+var hotChartData = [
+  {title:'배앓이가 너무 심해요 😭', author:'지우맘', time:'3시간 전', likes:156, comments:47, change:'up', delta:12},
+  {title:'첫 뒤집기 성공했어요!!', author:'하은맘', time:'1시간 전', likes:98, comments:32, change:'up', delta:8},
+  {title:'이유식 시작 타이밍 언제가 좋을까요?', author:'서연맘', time:'5시간 전', likes:87, comments:28, change:'same', delta:0},
+  {title:'놀이매트 추천 부탁드려요', author:'수아맘', time:'어제', likes:64, comments:15, change:'down', delta:2},
+  {title:'남편 육아 분담 어떻게 하시나요?', author:'민준맘', time:'30분 전', likes:45, comments:22, change:'new', delta:0}
+];
+
+function renderHotChart(){
+  var list = document.getElementById('hotChartList');
+  if(!list) return;
+  var html = '';
+  hotChartData.forEach(function(item, i){
+    var rank = i + 1;
+    var changeIcon = '';
+    if(item.change === 'up') changeIcon = '<div class="hot-chart-change up">▲'+item.delta+'</div>';
+    else if(item.change === 'down') changeIcon = '<div class="hot-chart-change down">▼'+item.delta+'</div>';
+    else if(item.change === 'new') changeIcon = '<div class="hot-chart-change new">NEW</div>';
+    else changeIcon = '<div class="hot-chart-change same">━</div>';
+
+    var score = item.likes + item.comments * 3;
+
+    html += '<li class="hot-chart-item" onclick="openHotPost('+i+')">' +
+      '<div class="hot-chart-rank">'+rank+'</div>' +
+      changeIcon +
+      '<div class="hot-chart-body">' +
+        '<p>'+item.title+'</p>' +
+        '<div class="hc-meta">' +
+          '<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'+item.likes+'</span>' +
+          '<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'+item.comments+'</span>' +
+          '<span>'+item.author+' · '+item.time+'</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="hot-chart-score">'+score+'점</div>' +
+    '</li>';
+  });
+  list.innerHTML = html;
+}
+
+function openHotPost(idx){
+  var item = hotChartData[idx];
+  if(!item) return;
+  // 인기탭의 해당 게시글이 있으면 열기, 없으면 첫번째 게시글 열기
+  var posts = document.querySelectorAll('#comm-popular .post');
+  var target = posts[idx < posts.length ? idx : 0];
+  if(target) openPostDetail(target);
+}
+
+renderHotChart();
+
 // ─── Topic card click → show posts ───
 var topicPosts = {
   '수유/이유식': [
@@ -4497,6 +4605,11 @@ var topicPosts = {
   '육아템 추천': [
     {name:'하은맘',tier:'별맘',t:'t1',avatar:'🐥',g:'g1',age:'11개월',time:'2시간 전',body:'아토팜 로션 써봤는데 진짜 좋아요 🥹<br>발림성도 좋고 무향이라 아기한테 안심!',tags:'#아기로션 #육아템추천'},
     {name:'수아맘',tier:'별맘',t:'t1',avatar:'🐰',g:'g1',age:'14개월',time:'어제',body:'놀이방 매트 추천 부탁드려요!<br>폴더매트 이음새 사이로 과자가 다 들어가요 😅',tags:'#놀이매트 #육아템'}
+  ],
+  '육아템 나눔': [
+    {name:'예은맘',tier:'별맘',t:'t1',avatar:'🐱',g:'g2',age:'18개월',time:'1시간 전',body:'범보 의자 나눔합니다!<br>하은이가 커서 이제 안 쓰는데 상태 좋아요<br>직거래 가능하신 분 댓글 주세요 🙌',tags:'#나눔 #범보의자 #직거래'},
+    {name:'도윤맘',tier:'별맘',t:'t1',avatar:'🐣',g:'g1',age:'8개월',time:'3시간 전',body:'신생아 내복 50~60사이즈 5벌 나눔해요<br>한두번 입힌 거라 깨끗합니다!',tags:'#나눔 #신생아옷 #내복'},
+    {name:'시우맘',tier:'새싹맘',t:'t1',avatar:'🐥',g:'g4',age:'5개월',time:'어제',body:'닥터브라운 젖병 160ml 3개 저렴하게 양도해요<br>소독기도 같이 드릴 수 있어요',tags:'#양도 #젖병 #닥터브라운'}
   ],
   '발달/성장': [
     {name:'민준맘',tier:'인증단',t:'t3',avatar:'🦊',g:'g3',age:'24개월',time:'어제',body:'두돌 지나니까 말이 갑자기 트이네요 🤩<br>어제 처음으로 "엄마 사랑해" 했는데 울 뻔 ㅠㅠ',tags:'#두돌아기 #언어발달'},
