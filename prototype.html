@@ -939,6 +939,182 @@
     border-radius:8px;cursor:pointer;font-family:inherit;
   }
 
+  /* 포스트 메뉴 & 신고 바텀시트 */
+  .sheet-overlay{
+    position:absolute;top:0;left:0;right:0;bottom:0;z-index:95;
+    background:rgba(0,0,0,0.45);display:none;align-items:flex-end;
+  }
+  .sheet-overlay.show{display:flex;}
+  .bottom-sheet{
+    width:100%;background:#fff;border-radius:20px 20px 0 0;
+    padding:12px 20px 34px;animation:sheetUp .25s ease;
+    max-height:75vh;overflow-y:auto;
+  }
+  @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .bs-handle{
+    width:40px;height:4px;border-radius:4px;background:#E0E0E0;
+    margin:0 auto 16px;
+  }
+  .pm-option{
+    display:flex;align-items:center;gap:12px;
+    padding:13px 0;cursor:pointer;border-bottom:1px solid var(--border);
+  }
+  .pm-option:last-child{border-bottom:none;}
+  .pm-option:active{opacity:0.7;}
+  .pm-option.danger .pm-label{color:var(--acc);}
+  .pm-option.danger .pm-desc{color:rgba(212,131,106,0.7);}
+  .pm-icon{font-size:18px;width:24px;text-align:center;}
+  .pm-label{font-size:14px;font-weight:600;color:var(--text);}
+  .pm-desc{font-size:10px;color:var(--sub);margin-top:1px;}
+
+  /* 신고 카테고리 */
+  .report-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;}
+  .report-desc{font-size:12px;color:var(--sub);margin-bottom:16px;}
+  .report-option{
+    display:flex;align-items:center;gap:12px;
+    padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer;
+  }
+  .report-option:last-child{border-bottom:none;}
+  .report-option:active{opacity:0.7;}
+  .ro-icon{
+    width:36px;height:36px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;background:var(--bg);flex-shrink:0;
+  }
+  .ro-text{flex:1;}
+  .ro-text h5{font-size:13px;font-weight:700;color:var(--text);}
+  .ro-text p{font-size:10px;color:var(--sub);margin-top:1px;}
+  .ro-arrow{color:var(--sub);font-size:14px;}
+
+  .report-detail{display:none;}
+  .report-detail.show{display:block;}
+  .report-textarea{
+    width:100%;height:80px;border:1.5px solid var(--border);border-radius:12px;
+    padding:12px;font-size:12px;font-family:inherit;resize:none;outline:none;
+    box-sizing:border-box;
+  }
+  .report-textarea:focus{border-color:var(--pri);}
+  .report-submit{
+    width:100%;padding:14px;border:none;border-radius:14px;
+    font-size:14px;font-weight:700;cursor:pointer;
+    background:var(--acc);color:#fff;font-family:inherit;margin-top:12px;
+  }
+  .report-complete{text-align:center;padding:20px 0;display:none;}
+  .report-complete.show{display:block;}
+  .rc-icon{font-size:48px;margin-bottom:12px;}
+  .rc-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;}
+  .rc-desc{font-size:12px;color:var(--sub);line-height:1.7;}
+  .rc-block-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:10px 20px;border:1.5px solid var(--acc);border-radius:12px;
+    font-size:13px;font-weight:600;color:var(--acc);background:none;
+    cursor:pointer;margin-top:16px;font-family:inherit;
+  }
+  .rc-done-btn{
+    width:100%;padding:14px;border:none;border-radius:14px;
+    font-size:14px;font-weight:700;cursor:pointer;
+    background:var(--pri);color:#fff;font-family:inherit;margin-top:12px;
+  }
+
+  /* 신고 내역 */
+  .rh-item{padding:14px 0;border-bottom:1px solid var(--border);}
+  .rh-item:last-child{border-bottom:none;}
+  .rh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .rh-category{font-size:12px;font-weight:700;color:var(--text);}
+  .rh-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;}
+  .rh-status.pending{background:#FFF3E0;color:#E65100;}
+  .rh-status.done{background:#E8F5E9;color:#2E7D32;}
+  .rh-status.dismissed{background:#F5F5F5;color:var(--sub);}
+  .rh-content{font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:4px;}
+  .rh-date{font-size:10px;color:#BDBDBD;}
+
+  /* 탈퇴 플로우 */
+  .wd-step{display:none;}
+  .wd-step.show{display:block;}
+  .wd-warning{
+    background:#FFF3E0;border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .wd-warning .wd-w-icon{font-size:24px;margin-bottom:8px;}
+  .wd-warning h4{font-size:14px;font-weight:800;color:#E65100;margin-bottom:4px;}
+  .wd-warning p{font-size:12px;color:#BF360C;line-height:1.6;}
+  .wd-info-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;}
+  .wd-info-icon{font-size:16px;margin-top:1px;flex-shrink:0;}
+  .wd-info-text h5{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
+  .wd-info-text p{font-size:11px;color:var(--sub);line-height:1.5;}
+  .wd-reason{
+    display:flex;align-items:center;gap:10px;
+    padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;
+    margin-bottom:8px;cursor:pointer;font-size:13px;color:var(--text);transition:all .15s;
+  }
+  .wd-reason.selected{border-color:var(--acc);background:rgba(212,131,106,0.08);}
+  .wd-reason-check{
+    width:20px;height:20px;border-radius:50%;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;
+  }
+  .wd-reason.selected .wd-reason-check{border-color:var(--acc);background:var(--acc);}
+  .wd-reason.selected .wd-reason-check::after{content:'\2713';color:#fff;font-size:11px;font-weight:700;}
+  .wd-next-btn{
+    width:100%;padding:14px;border:none;border-radius:14px;
+    font-size:14px;font-weight:700;cursor:pointer;
+    background:#D1D1D6;color:#fff;font-family:inherit;transition:all .2s;margin-top:16px;
+  }
+  .wd-next-btn.active{background:var(--acc);}
+  .wd-data-option{
+    padding:14px;border:1.5px solid var(--border);border-radius:12px;
+    margin-bottom:8px;cursor:pointer;transition:all .15s;
+  }
+  .wd-data-option.selected{border-color:var(--pri);background:rgba(168,119,80,0.06);}
+  .wd-data-option h5{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
+  .wd-data-option p{font-size:11px;color:var(--sub);}
+  .wd-confirm-box{
+    background:#FFEBEE;border-radius:14px;padding:20px;margin:16px 0;text-align:center;
+  }
+  .wd-bye-emoji{font-size:36px;margin-bottom:8px;}
+  .wd-confirm-box h4{font-size:14px;font-weight:800;color:#C62828;margin-bottom:4px;}
+  .wd-confirm-box p{font-size:12px;color:#B71C1C;line-height:1.6;}
+  .wd-confirm-input{
+    width:100%;padding:14px;border:2px solid var(--border);border-radius:12px;
+    font-size:14px;text-align:center;font-weight:600;
+    font-family:inherit;outline:none;margin-top:16px;box-sizing:border-box;transition:border-color .2s;
+  }
+  .wd-confirm-input:focus{border-color:var(--acc);}
+  .wd-confirm-input::placeholder{color:#D1D1D6;font-weight:400;}
+  .wd-final-btn{
+    width:100%;padding:14px;border:none;border-radius:14px;
+    font-size:14px;font-weight:700;cursor:pointer;
+    background:var(--acc);color:#fff;font-family:inherit;
+    opacity:0.4;pointer-events:none;transition:all .2s;margin-top:12px;
+  }
+  .wd-final-btn.active{opacity:1;pointer-events:auto;}
+  .wd-complete{text-align:center;padding:40px 20px;}
+  .wd-complete .wd-bye-big{font-size:56px;margin-bottom:16px;}
+  .wd-complete h3{font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;}
+  .wd-complete p{font-size:13px;color:var(--sub);line-height:1.7;margin-bottom:20px;}
+  .wd-home-btn{
+    display:inline-block;padding:14px 40px;
+    background:var(--pri);color:#fff;border:none;border-radius:14px;
+    font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+
+  /* 계정 관리 */
+  .acct-section{margin-bottom:20px;}
+  .acct-section-title{font-size:11px;font-weight:700;color:var(--sub);margin-bottom:10px;letter-spacing:0.5px;}
+  .acct-item{
+    display:flex;align-items:center;gap:12px;
+    padding:14px;background:#fff;border-radius:12px;
+    margin-bottom:8px;border:1px solid var(--border);cursor:pointer;
+  }
+  .acct-item:active{opacity:0.7;}
+  .acct-icon{
+    width:36px;height:36px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+  }
+  .acct-text{flex:1;}
+  .acct-text h5{font-size:13px;font-weight:700;color:var(--text);}
+  .acct-text p{font-size:10px;color:var(--sub);margin-top:1px;}
+  .acct-arrow{color:var(--sub);font-size:14px;}
+  .acct-item.danger .acct-text h5{color:var(--acc);}
+
   /* ═══════ INFO SCREEN ═══════ */
   .info-header{text-align:center;padding:20px 16px 12px;}
   .info-header .ih-emoji{font-size:36px;margin-bottom:6px;}
@@ -2601,11 +2777,27 @@
           </div>
           <div class="prof-menu-arrow">›</div>
         </div>
+        <div class="prof-menu-item" onclick="goSub('s-report-history')">
+          <div class="prof-menu-icon" style="background:#FFEBEE;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4836A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+          <div class="prof-menu-text">
+            <h5>신고 내역</h5>
+            <p>내가 신고한 게시글 내역</p>
+          </div>
+          <div class="prof-menu-arrow">›</div>
+        </div>
+        <div class="prof-menu-item" onclick="goSub('s-account-manage')">
+          <div class="prof-menu-icon" style="background:#F5F5F5;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A8E82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+          <div class="prof-menu-text">
+            <h5>계정 관리</h5>
+            <p>계정 정보, 탈퇴</p>
+          </div>
+          <div class="prof-menu-arrow">›</div>
+        </div>
       </div>
 
       <div class="prof-danger">
-        <button class="prof-danger-btn" onclick="showToast('로그아웃 되었습니다')">로그아웃</button>
-        <button class="prof-danger-btn red" onclick="showToast('정말 탈퇴하시겠습니까?')">탈퇴하기</button>
+        <button class="prof-danger-btn" onclick="confirmLogout()">로그아웃</button>
+        <button class="prof-danger-btn red" onclick="goSub('s-withdraw')">탈퇴하기</button>
       </div>
     </div>
 
@@ -3465,6 +3657,261 @@
       </div>
     </div>
 
+    <!-- ═══════ SUB: 신고 내역 ═══════ -->
+    <div class="screen sub-screen hidden-right" id="s-report-history">
+      <div class="back-header" onclick="goBack()">
+        <span class="arrow">←</span> 신고 내역
+      </div>
+      <div class="sub-content">
+        <div style="font-size:12px;color:var(--sub);margin-bottom:16px;line-height:1.7;">
+          신고하신 내역은 최대 90일간 보관됩니다.
+        </div>
+
+        <div class="rh-item">
+          <div class="rh-top">
+            <span class="rh-category">욕설/비방</span>
+            <span class="rh-status done">처리완료</span>
+          </div>
+          <div class="rh-content">"스팸계정01" 님의 게시글 — 부적절한 언어 사용</div>
+          <div class="rh-date">2025.02.14 신고 · 2025.02.15 처리</div>
+        </div>
+        <div class="rh-item">
+          <div class="rh-top">
+            <span class="rh-category">스팸/광고</span>
+            <span class="rh-status done">처리완료</span>
+          </div>
+          <div class="rh-content">"광고쟁이맘" 님의 게시글 — 반복적 광고 게시</div>
+          <div class="rh-date">2025.02.19 신고 · 2025.02.20 처리</div>
+        </div>
+        <div class="rh-item">
+          <div class="rh-top">
+            <span class="rh-category">허위정보</span>
+            <span class="rh-status pending">검토중</span>
+          </div>
+          <div class="rh-content">"건강전문가" 님의 게시글 — 검증되지 않은 의료 정보</div>
+          <div class="rh-date">2025.02.28 신고</div>
+        </div>
+
+        <div style="text-align:center;padding:30px 0;color:var(--sub);font-size:12px;">
+          총 <strong style="color:var(--text);">3건</strong>의 신고 내역
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SUB: 계정 관리 ═══════ -->
+    <div class="screen sub-screen hidden-right" id="s-account-manage">
+      <div class="back-header" onclick="goBack()">
+        <span class="arrow">←</span> 계정 관리
+      </div>
+      <div class="sub-content">
+        <div class="acct-section">
+          <div class="acct-section-title">계정</div>
+          <div class="acct-item" onclick="showToast('카카오 연동 상태입니다')">
+            <div class="acct-icon" style="background:#FEE500;">💬</div>
+            <div class="acct-text">
+              <h5>카카오 계정 연동</h5>
+              <p>kakao_mom****@kakao.com</p>
+            </div>
+            <div class="acct-arrow">›</div>
+          </div>
+          <div class="acct-item" onclick="goSub('s-noti-setting')">
+            <div class="acct-icon" style="background:#E3F2FD;">🔔</div>
+            <div class="acct-text">
+              <h5>알림 설정</h5>
+              <p>야간알림, 마케팅 알림 관리</p>
+            </div>
+            <div class="acct-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="acct-section">
+          <div class="acct-section-title">개인정보</div>
+          <div class="acct-item" onclick="goSub('s-child-info')">
+            <div class="acct-icon" style="background:#FFF3E0;">👶</div>
+            <div class="acct-text">
+              <h5>아이정보 관리</h5>
+              <p>아이 이름, 생년월일, 성별</p>
+            </div>
+            <div class="acct-arrow">›</div>
+          </div>
+          <div class="acct-item" onclick="goSub('s-block-list')">
+            <div class="acct-icon" style="background:#FBF5F0;">🚫</div>
+            <div class="acct-text">
+              <h5>차단회원 관리</h5>
+              <p>차단한 회원 2명</p>
+            </div>
+            <div class="acct-arrow">›</div>
+          </div>
+          <div class="acct-item" onclick="goSub('s-report-history')">
+            <div class="acct-icon" style="background:#FFEBEE;">🚨</div>
+            <div class="acct-text">
+              <h5>신고 내역</h5>
+              <p>내가 신고한 게시글/회원 내역</p>
+            </div>
+            <div class="acct-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="acct-section">
+          <div class="acct-section-title">약관/정책</div>
+          <div class="acct-item" onclick="showToast('이용약관 페이지로 이동합니다')">
+            <div class="acct-icon" style="background:#F5F5F5;">📋</div>
+            <div class="acct-text">
+              <h5>이용약관</h5>
+              <p>서비스 이용약관 확인</p>
+            </div>
+            <div class="acct-arrow">›</div>
+          </div>
+          <div class="acct-item" onclick="showToast('개인정보 처리방침 페이지로 이동합니다')">
+            <div class="acct-icon" style="background:#F5F5F5;">🔒</div>
+            <div class="acct-text">
+              <h5>개인정보 처리방침</h5>
+              <p>개인정보 수집/이용 안내</p>
+            </div>
+            <div class="acct-arrow">›</div>
+          </div>
+        </div>
+
+        <div style="padding:20px 0;border-top:1px solid var(--border);margin-top:8px;">
+          <div class="acct-item" onclick="confirmLogout()" style="border-color:transparent;background:var(--bg);">
+            <div class="acct-icon" style="background:#F5F5F5;">🚪</div>
+            <div class="acct-text">
+              <h5>로그아웃</h5>
+              <p>현재 계정에서 로그아웃</p>
+            </div>
+          </div>
+          <div class="acct-item danger" onclick="goSub('s-withdraw')" style="border-color:rgba(212,131,106,0.3);background:rgba(212,131,106,0.04);">
+            <div class="acct-icon" style="background:#FFEBEE;">⚠️</div>
+            <div class="acct-text">
+              <h5>탈퇴하기</h5>
+              <p>계정을 영구적으로 삭제합니다</p>
+            </div>
+            <div class="acct-arrow" style="color:var(--acc);">›</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;padding:10px 0 20px;font-size:10px;color:#BDBDBD;">
+          엄마의우주 v1.0.0
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SUB: 탈퇴하기 ═══════ -->
+    <div class="screen sub-screen hidden-right" id="s-withdraw">
+      <div class="back-header" onclick="goBack();resetWithdraw()">
+        <span class="arrow">←</span> 탈퇴하기
+      </div>
+      <div class="sub-content" id="withdrawContent">
+        <!-- Step 1: 경고 + 사유 -->
+        <div class="wd-step show" id="wdStep1">
+          <div class="wd-warning">
+            <div class="wd-w-icon">⚠️</div>
+            <h4>정말 떠나시나요?</h4>
+            <p>탈퇴 시 아래 정보가 모두 삭제되며,<br>삭제된 데이터는 복구할 수 없습니다.</p>
+          </div>
+
+          <div style="margin:16px 0;">
+            <div class="wd-info-item">
+              <div class="wd-info-icon">📝</div>
+              <div class="wd-info-text">
+                <h5>게시글 · 댓글</h5>
+                <p>작성한 모든 게시글과 댓글이 삭제됩니다</p>
+              </div>
+            </div>
+            <div class="wd-info-item">
+              <div class="wd-info-icon">⭐</div>
+              <div class="wd-info-text">
+                <h5>별조각 1,250개 소멸</h5>
+                <p>적립한 별조각은 모두 소멸되며 환불되지 않습니다</p>
+              </div>
+            </div>
+            <div class="wd-info-item">
+              <div class="wd-info-icon">🏅</div>
+              <div class="wd-info-text">
+                <h5>등급 · 미션 초기화</h5>
+                <p>별맘 등급과 완료한 미션이 모두 사라집니다</p>
+              </div>
+            </div>
+            <div class="wd-info-item">
+              <div class="wd-info-icon">👥</div>
+              <div class="wd-info-text">
+                <h5>공동육아 모임 탈퇴</h5>
+                <p>참여 중인 모든 모임에서 자동 탈퇴됩니다</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin:20px 0 12px;">탈퇴 사유를 선택해주세요</div>
+          <div class="wd-reason" onclick="selectWdReason(this)">
+            <div class="wd-reason-check"></div>
+            사용 빈도가 낮아요
+          </div>
+          <div class="wd-reason" onclick="selectWdReason(this)">
+            <div class="wd-reason-check"></div>
+            원하는 콘텐츠가 없어요
+          </div>
+          <div class="wd-reason" onclick="selectWdReason(this)">
+            <div class="wd-reason-check"></div>
+            다른 서비스를 이용하게 됐어요
+          </div>
+          <div class="wd-reason" onclick="selectWdReason(this)">
+            <div class="wd-reason-check"></div>
+            개인정보가 걱정돼요
+          </div>
+          <div class="wd-reason" onclick="selectWdReason(this)">
+            <div class="wd-reason-check"></div>
+            커뮤니티 분위기가 맞지 않아요
+          </div>
+          <div class="wd-reason" onclick="selectWdReason(this)">
+            <div class="wd-reason-check"></div>
+            기타
+          </div>
+          <button class="wd-next-btn" id="wdNext1" onclick="goWdStep(2)">다음</button>
+        </div>
+
+        <!-- Step 2: 데이터 처리 -->
+        <div class="wd-step" id="wdStep2">
+          <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;">게시글 처리 방법</div>
+          <div style="font-size:12px;color:var(--sub);margin-bottom:16px;line-height:1.6;">탈퇴 후 게시글을 어떻게 처리할지 선택해주세요.</div>
+
+          <div class="wd-data-option" onclick="selectWdData(this)">
+            <h5>🗑️ 모든 게시글 · 댓글 삭제</h5>
+            <p>작성한 모든 콘텐츠를 완전히 삭제합니다. 다른 회원이 더 이상 볼 수 없습니다.</p>
+          </div>
+          <div class="wd-data-option" onclick="selectWdData(this)">
+            <h5>👤 게시글 유지 · 닉네임 익명 처리</h5>
+            <p>게시글은 남기되 "탈퇴한 회원"으로 표시됩니다. 다른 분들에게 도움이 될 수 있어요.</p>
+          </div>
+          <button class="wd-next-btn" id="wdNext2" onclick="goWdStep(3)">다음</button>
+        </div>
+
+        <!-- Step 3: 최종 확인 -->
+        <div class="wd-step" id="wdStep3">
+          <div class="wd-confirm-box">
+            <div class="wd-bye-emoji">😢</div>
+            <h4>마지막 확인입니다</h4>
+            <p>탈퇴 후 30일 이내에 다시 로그인하면<br>계정을 복구할 수 있습니다.</p>
+          </div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">아래에 <span style="color:var(--acc);">"탈퇴하기"</span>를 입력해주세요</div>
+          <input class="wd-confirm-input" id="wdConfirmInput" type="text" placeholder="탈퇴하기" oninput="checkWdConfirm()">
+          <button class="wd-final-btn" id="wdFinalBtn" onclick="executeWithdraw()">탈퇴하기</button>
+        </div>
+
+        <!-- Step 4: 완료 -->
+        <div class="wd-step" id="wdStep4">
+          <div class="wd-complete">
+            <div class="wd-bye-big">🌙</div>
+            <h3>안녕히 가세요</h3>
+            <p>그동안 엄마의우주와 함께해 주셔서<br>진심으로 감사합니다.<br><br>
+            30일 이내에 다시 로그인하시면<br>계정을 복구할 수 있어요.<br><br>
+            언제든 다시 돌아오실 수 있습니다 💫</p>
+            <button class="wd-home-btn" onclick="withdrawComplete()">처음으로</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /screens -->
 
   <!-- 검색 오버레이 -->
@@ -3588,6 +4035,104 @@
     </div>
     <div class="user-posts-header" id="userPostsHeader"></div>
     <div class="user-posts-list" id="userPostsList"></div>
+  </div>
+
+  <!-- ═══════ 포스트 메뉴 바텀시트 ═══════ -->
+  <div class="sheet-overlay" id="postMenuSheet" onclick="closePostMenu()">
+    <div class="bottom-sheet" onclick="event.stopPropagation()">
+      <div class="bs-handle"></div>
+      <div class="pm-option" onclick="savePost()">
+        <div class="pm-icon">🔖</div>
+        <div><div class="pm-label">저장하기</div><div class="pm-desc">나중에 다시 볼 수 있어요</div></div>
+      </div>
+      <div class="pm-option" onclick="shareFromMenu()">
+        <div class="pm-icon">🔗</div>
+        <div><div class="pm-label">공유하기</div><div class="pm-desc">링크를 복사합니다</div></div>
+      </div>
+      <div class="pm-option" onclick="hidePost()">
+        <div class="pm-icon">🙈</div>
+        <div><div class="pm-label">이 글 숨기기</div><div class="pm-desc">피드에서 이 글을 숨깁니다</div></div>
+      </div>
+      <div class="pm-option danger" onclick="openReportSheet()">
+        <div class="pm-icon">🚨</div>
+        <div><div class="pm-label">신고하기</div><div class="pm-desc">부적절한 게시글을 신고합니다</div></div>
+      </div>
+      <div class="pm-option danger" onclick="blockUserFromPost()">
+        <div class="pm-icon">🚫</div>
+        <div><div class="pm-label">이 회원 차단</div><div class="pm-desc">이 회원의 글이 더 이상 보이지 않아요</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 신고 바텀시트 ═══════ -->
+  <div class="sheet-overlay" id="reportSheet" onclick="closeReportSheet()">
+    <div class="bottom-sheet" onclick="event.stopPropagation()">
+      <div class="bs-handle"></div>
+      <!-- 카테고리 선택 -->
+      <div id="reportCategories">
+        <div class="report-title">신고 사유 선택</div>
+        <div class="report-desc">해당하는 사유를 선택해 주세요</div>
+        <div class="report-option" onclick="selectReportCategory('스팸/광고')">
+          <div class="ro-icon">📢</div>
+          <div class="ro-text"><h5>스팸 · 광고</h5><p>상업적 광고, 스팸성 게시글</p></div>
+          <div class="ro-arrow">›</div>
+        </div>
+        <div class="report-option" onclick="selectReportCategory('욕설/비방')">
+          <div class="ro-icon">🤬</div>
+          <div class="ro-text"><h5>욕설 · 비방</h5><p>욕설, 인신공격, 명예훼손</p></div>
+          <div class="ro-arrow">›</div>
+        </div>
+        <div class="report-option" onclick="selectReportCategory('음란/부적절')">
+          <div class="ro-icon">⛔</div>
+          <div class="ro-text"><h5>음란 · 부적절</h5><p>선정적이거나 부적절한 콘텐츠</p></div>
+          <div class="ro-arrow">›</div>
+        </div>
+        <div class="report-option" onclick="selectReportCategory('허위정보')">
+          <div class="ro-icon">❌</div>
+          <div class="ro-text"><h5>허위정보</h5><p>거짓 정보, 검증되지 않은 의료/건강 정보</p></div>
+          <div class="ro-arrow">›</div>
+        </div>
+        <div class="report-option" onclick="selectReportCategory('도배/도용')">
+          <div class="ro-icon">📋</div>
+          <div class="ro-text"><h5>도배 · 도용</h5><p>같은 글 반복, 타인 콘텐츠 도용</p></div>
+          <div class="ro-arrow">›</div>
+        </div>
+        <div class="report-option" onclick="selectReportCategory('기타')">
+          <div class="ro-icon">💬</div>
+          <div class="ro-text"><h5>기타</h5><p>위 항목에 해당하지 않는 문제</p></div>
+          <div class="ro-arrow">›</div>
+        </div>
+      </div>
+      <!-- 상세 입력 -->
+      <div class="report-detail" id="reportDetail">
+        <div class="report-title" id="reportCatTitle">신고 사유</div>
+        <div class="report-desc">추가 설명을 입력해 주세요 (선택)</div>
+        <textarea class="report-textarea" id="reportReasonText" placeholder="구체적인 내용을 작성해 주시면 검토에 도움이 됩니다..."></textarea>
+        <button class="report-submit" onclick="submitReport()">신고 접수하기</button>
+      </div>
+      <!-- 완료 -->
+      <div class="report-complete" id="reportComplete">
+        <div class="rc-icon">✅</div>
+        <div class="rc-title">신고가 접수되었습니다</div>
+        <div class="rc-desc">운영팀이 24시간 이내에 검토 후<br>적절한 조치를 취하겠습니다.</div>
+        <button class="rc-block-btn" id="rcBlockBtn" onclick="blockAfterReport()">🚫 이 회원도 차단하기</button>
+        <button class="rc-done-btn" onclick="closeReportSheet()">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 로그아웃 확인 ═══════ -->
+  <div class="sheet-overlay" id="logoutSheet" onclick="closeLogoutSheet()">
+    <div class="bottom-sheet" onclick="event.stopPropagation()" style="text-align:center;padding:24px 20px 34px;">
+      <div class="bs-handle"></div>
+      <div style="font-size:36px;margin-bottom:12px;">👋</div>
+      <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;">로그아웃 하시겠어요?</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:20px;line-height:1.6;">다시 로그인하면 모든 데이터가<br>그대로 유지됩니다.</div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeLogoutSheet()" style="flex:1;padding:14px;border:1.5px solid var(--border);border-radius:14px;font-size:14px;font-weight:700;background:#fff;color:var(--text);cursor:pointer;font-family:inherit;">취소</button>
+        <button onclick="executeLogout()" style="flex:1;padding:14px;border:none;border-radius:14px;font-size:14px;font-weight:700;background:var(--pri);color:#fff;cursor:pointer;font-family:inherit;">로그아웃</button>
+      </div>
+    </div>
   </div>
 
   <!-- ═══════ 유저 프로필 팝업 ═══════ -->
@@ -3827,11 +4372,162 @@ function toggleReact(btn) {
   }
 }
 
-// ─── Post Menu & Share ───
+// ─── Post Menu & Report/Block Flow ───
+var currentMenuPost = null;
+var currentReportCategory = '';
+
 function showPostMenu(){
-  var choice = confirm('이 글을 신고하시겠어요?\n\n[확인] 신고하기\n[취소] 닫기');
-  if(choice) showToast('신고가 접수되었습니다. 검토 후 조치됩니다.');
+  var hovered = document.querySelector('.p-more:hover');
+  if(hovered) currentMenuPost = hovered.closest('.post');
+  document.getElementById('postMenuSheet').classList.add('show');
 }
+function closePostMenu(){
+  document.getElementById('postMenuSheet').classList.remove('show');
+}
+function savePost(){
+  closePostMenu();
+  showToast('게시글이 저장되었습니다 🔖');
+}
+function shareFromMenu(){
+  closePostMenu();
+  showToast('링크가 복사되었습니다 📋');
+}
+function hidePost(){
+  if(currentMenuPost){
+    currentMenuPost.style.transition = 'opacity 0.3s, max-height 0.3s';
+    currentMenuPost.style.opacity = '0';
+    currentMenuPost.style.maxHeight = '0';
+    currentMenuPost.style.overflow = 'hidden';
+    setTimeout(function(){ currentMenuPost.style.display = 'none'; }, 300);
+  }
+  closePostMenu();
+  showToast('이 글이 숨겨졌습니다');
+}
+function blockUserFromPost(){
+  if(!currentMenuPost){ closePostMenu(); return; }
+  var nameEl = currentMenuPost.querySelector('.p-name');
+  var name = nameEl ? nameEl.textContent.trim().split(' ')[0] : '이 회원';
+  closePostMenu();
+  setTimeout(function(){
+    var ok = confirm(name + ' 님을 차단하시겠어요?\n\n차단하면 이 회원의 글과 댓글이\n커뮤니티에서 보이지 않습니다.');
+    if(ok) showToast(name + ' 님이 차단되었습니다 🚫');
+  }, 250);
+}
+
+// ─── Report Sheet ───
+function openReportSheet(){
+  closePostMenu();
+  setTimeout(function(){
+    document.getElementById('reportCategories').style.display = 'block';
+    document.getElementById('reportDetail').classList.remove('show');
+    document.getElementById('reportComplete').classList.remove('show');
+    document.getElementById('reportSheet').classList.add('show');
+  }, 250);
+}
+function closeReportSheet(){
+  document.getElementById('reportSheet').classList.remove('show');
+}
+function selectReportCategory(cat){
+  currentReportCategory = cat;
+  document.getElementById('reportCategories').style.display = 'none';
+  document.getElementById('reportCatTitle').textContent = cat + ' 신고';
+  document.getElementById('reportReasonText').value = '';
+  document.getElementById('reportDetail').classList.add('show');
+}
+function submitReport(){
+  document.getElementById('reportDetail').classList.remove('show');
+  document.getElementById('reportComplete').classList.add('show');
+  if(currentMenuPost){
+    var nameEl = currentMenuPost.querySelector('.p-name');
+    var name = nameEl ? nameEl.textContent.trim().split(' ')[0] : '이 회원';
+    var btn = document.getElementById('rcBlockBtn');
+    btn.textContent = '🚫 ' + name + ' 님 차단하기';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    btn.onclick = blockAfterReport;
+  }
+}
+function blockAfterReport(){
+  var btn = document.getElementById('rcBlockBtn');
+  btn.textContent = '✅ 차단되었습니다';
+  btn.style.borderColor = '#2E7D32';
+  btn.style.color = '#2E7D32';
+  btn.onclick = null;
+}
+
+// ─── Withdraw Flow ───
+var wdSelectedReason = false;
+var wdSelectedData = false;
+
+function selectWdReason(el){
+  document.querySelectorAll('.wd-reason').forEach(function(r){ r.classList.remove('selected'); });
+  el.classList.add('selected');
+  wdSelectedReason = true;
+  document.getElementById('wdNext1').classList.add('active');
+}
+function selectWdData(el){
+  document.querySelectorAll('.wd-data-option').forEach(function(d){ d.classList.remove('selected'); });
+  el.classList.add('selected');
+  wdSelectedData = true;
+  document.getElementById('wdNext2').classList.add('active');
+}
+function goWdStep(step){
+  if(step === 2 && !wdSelectedReason) return;
+  if(step === 3 && !wdSelectedData) return;
+  document.querySelectorAll('.wd-step').forEach(function(s){ s.classList.remove('show'); });
+  document.getElementById('wdStep' + step).classList.add('show');
+  var sc = document.getElementById('withdrawContent');
+  if(sc) sc.scrollTop = 0;
+}
+function checkWdConfirm(){
+  var val = document.getElementById('wdConfirmInput').value.trim();
+  var btn = document.getElementById('wdFinalBtn');
+  if(val === '탈퇴하기') btn.classList.add('active');
+  else btn.classList.remove('active');
+}
+function executeWithdraw(){
+  if(document.getElementById('wdConfirmInput').value.trim() !== '탈퇴하기') return;
+  goWdStep(4);
+}
+function resetWithdraw(){
+  wdSelectedReason = false;
+  wdSelectedData = false;
+  document.querySelectorAll('.wd-reason').forEach(function(r){ r.classList.remove('selected'); });
+  document.querySelectorAll('.wd-data-option').forEach(function(d){ d.classList.remove('selected'); });
+  var n1 = document.getElementById('wdNext1'); if(n1) n1.classList.remove('active');
+  var n2 = document.getElementById('wdNext2'); if(n2) n2.classList.remove('active');
+  var ci = document.getElementById('wdConfirmInput'); if(ci) ci.value = '';
+  var fb = document.getElementById('wdFinalBtn'); if(fb) fb.classList.remove('active');
+  document.querySelectorAll('.wd-step').forEach(function(s){ s.classList.remove('show'); });
+  var s1 = document.getElementById('wdStep1'); if(s1) s1.classList.add('show');
+}
+function withdrawComplete(){
+  goBack();
+  setTimeout(function(){
+    goBack();
+    setTimeout(function(){
+      document.getElementById('onboarding').style.display = 'flex';
+      resetWithdraw();
+      showToast('계정이 삭제되었습니다. 안녕히 가세요 🌙');
+    }, 300);
+  }, 300);
+}
+
+// ─── Logout ───
+function confirmLogout(){
+  document.getElementById('logoutSheet').classList.add('show');
+}
+function closeLogoutSheet(){
+  document.getElementById('logoutSheet').classList.remove('show');
+}
+function executeLogout(){
+  closeLogoutSheet();
+  setTimeout(function(){
+    document.getElementById('onboarding').style.display = 'flex';
+    showToast('로그아웃 되었습니다 👋');
+  }, 200);
+}
+
 function sharePost(btn){
   var el = btn.querySelector('.rc');
   var c = parseInt(el.textContent) || 0;
