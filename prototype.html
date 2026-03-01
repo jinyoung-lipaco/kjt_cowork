@@ -5357,6 +5357,7 @@ function finishOnboarding(){
   updateProfileBabyInfo();
   updateMonthMatchBar();
   updateMonthHighlight();
+  switchToPregnantContent();
 
   var ob = document.getElementById('onboarding');
   ob.style.transition = 'opacity .5s ease';
@@ -5535,6 +5536,99 @@ function showPersonalizedInfo(){
 function hidePersonalizedInfo(){
   var panel = document.getElementById('infoPersonalized');
   if(panel) panel.style.display = 'none';
+}
+
+// ═══════ 임산부 콘텐츠 전환 ═══════
+function switchToPregnantContent(){
+  if(!babyData.isPregnant) return;
+  var w = babyData.pregWeek || 20;
+  var pm = babyData.pregMonth || 5;
+  var label = '임신 ' + w + '주';
+  var trimester = pm <= 3 ? '초기' : pm <= 6 ? '중기' : '후기';
+
+  // 라운지 히어로
+  var lEmoji = document.querySelector('.lounge-emoji');
+  if(lEmoji) lEmoji.textContent = '🤰✨';
+  var lTitle = document.querySelector('.lounge-hero h2');
+  if(lTitle) lTitle.textContent = label + ' 예비맘 라운지';
+
+  // 라운지 채팅
+  var chatArea = document.getElementById('chatArea');
+  if(chatArea) chatArea.innerHTML =
+    '<div class="chat-bubble other"><div class="chat-name">봄날맘</div>입덧 언제 끝나나요... 8주째인데 너무 힘들어요 😭<div class="chat-time">오후 2:30</div></div>' +
+    '<div class="chat-bubble other"><div class="chat-name">달빛맘 🌙</div>저도 14주까지 했어요ㅠ 생강차가 좀 도움됐어요!<div class="chat-time">오후 2:32</div></div>' +
+    '<div class="chat-bubble mine">저는 신맛 나는 거 먹으면 좀 나아요. 레몬사탕 추천!<div class="chat-time">오후 2:34</div></div>' +
+    '<div class="chat-bubble other"><div class="chat-name">하늘맘 ☁️</div>태동 느끼신 분? 저 '+w+'주인데 아직 잘 모르겠어요<div class="chat-time">오후 2:40</div></div>' +
+    '<div class="chat-bubble other"><div class="chat-name">소망맘</div>출산 가방 준비 시작하셨어요? 리스트 공유해요!<div class="chat-time">오후 2:45</div></div>' +
+    '<div class="chat-bubble mine">아직 일러요~ 32주쯤 시작하려고요 😊<div class="chat-time">오후 2:47</div></div>';
+
+  // 라운지 글
+  var lPosts = document.getElementById('lounge-posts');
+  if(lPosts) lPosts.innerHTML =
+    '<div class="lounge-post"><div class="lounge-post-head"><div class="lounge-post-avatar" style="background:linear-gradient(135deg,#E8C97A,#D4A574);">🌸</div><div><div class="lounge-post-name">봄날맘</div><div class="lounge-post-meta">'+label+' · 1시간 전</div></div></div>' +
+    '<div class="lounge-post-body">임신 '+trimester+' 예비맘들 모여라! 🤰<br><br>요즘 먹고 싶은 것: 떡볶이, 치킨, 아이스크림<br>못 먹는 것: 생선회, 카페인<br><br>다들 크레이빙 뭐예요? ㅋㅋ</div>' +
+    '<div class="lounge-post-reactions">댓글 24 · 좋아요 38 · 저장 12</div></div>' +
+    '<div class="lounge-post"><div class="lounge-post-head"><div class="lounge-post-avatar" style="background:linear-gradient(135deg,#9CB5C4,#7A9AAE);">🌙</div><div><div class="lounge-post-name">달빛맘</div><div class="lounge-post-meta">'+label+' · 3시간 전</div></div></div>' +
+    '<div class="lounge-post-body">임산부 필수템 정리! 📋<br><br>1. 바디필로우 — 수면 자세 필수<br>2. 튼살크림 — 매일 바르기<br>3. 엽산/철분제 — 꾸준히 복용<br>4. 임산부 레깅스 — 편한 게 최고<br>5. 태교 음악 앱 — 매일 들려주기 🎵</div>' +
+    '<div class="lounge-post-reactions">댓글 15 · 좋아요 52 · 저장 41</div></div>' +
+    '<div class="lounge-post"><div class="lounge-post-head"><div class="lounge-post-avatar" style="background:linear-gradient(135deg,#DDB896,#C8956C);">☁️</div><div><div class="lounge-post-name">하늘맘</div><div class="lounge-post-meta">'+label+' · 5시간 전</div></div></div>' +
+    '<div class="lounge-post-body">산부인과 선택 기준 뭐였어요? 🏥<br>1. 집에서 가까운 곳<br>2. 분만실 시설<br>3. 의사 선생님 성향<br>4. 1인실 유무<br><br>저는 3번이 제일 중요했어요!</div>' +
+    '<div class="lounge-post-reactions">댓글 31 · 좋아요 22 · 저장 18</div></div>';
+
+  // 라운지 월령 정보 → 임산부 정보
+  var lInfo = document.getElementById('lounge-info');
+  if(lInfo) lInfo.innerHTML =
+    '<div style="padding:14px;">' +
+    '<div style="background:linear-gradient(135deg,#FBF5F0,#E8E0D8);border-radius:16px;padding:18px;margin-bottom:12px;">' +
+      '<div style="font-size:14px;font-weight:800;margin-bottom:8px;">📊 '+label+' 태아 발달</div>' +
+      '<div style="font-size:12px;line-height:2;color:var(--text);">' +
+        (pm <= 3 ? '✅ 심장 박동 시작<br>✅ 뇌, 척추 형성 중<br>✅ 손가락, 발가락 형태 갖춤<br>✅ 크기: 약 5~8cm<br>⬜ 태동 느끼기 (16~20주)<br>⬜ 성별 확인 (18~22주)' :
+         pm <= 6 ? '✅ 태동 시작<br>✅ 청각 발달 — 엄마 목소리 들림<br>✅ 손가락 빨기 시작<br>✅ 크기: 약 25~30cm<br>✅ 체중: 약 500~900g<br>⬜ 눈 뜨기 (28주~)<br>⬜ 폐 성숙 (34주~)' :
+         '✅ 폐 발달 진행 중<br>✅ 지방 축적 — 통통해지는 시기<br>✅ 머리가 아래로 자리잡기<br>✅ 크기: 약 45~50cm<br>✅ 체중: 약 2.5~3.5kg<br>📅 분만 예정일 체크<br>📅 출산 가방 준비') +
+      '</div></div>' +
+    '<div style="background:linear-gradient(135deg,#EEF2EA,#D2E0CE);border-radius:16px;padding:18px;margin-bottom:12px;">' +
+      '<div style="font-size:14px;font-weight:800;margin-bottom:8px;">🥗 임신 '+trimester+' 영양 가이드</div>' +
+      '<div style="font-size:12px;line-height:2;color:var(--text);">' +
+        (pm <= 3 ? '📌 엽산 매일 400~800μg 섭취<br>🥬 녹색 채소, 견과류 권장<br>⚠️ 카페인 하루 200mg 이하<br>⚠️ 생선회, 날음식 주의<br>💊 임산부 종합비타민 시작<br>💧 수분 하루 2L 이상' :
+         pm <= 6 ? '📌 철분제 복용 시작 (16주~)<br>🥩 단백질 충분히 섭취<br>🐟 오메가3 — DHA 보충<br>🥛 칼슘 하루 1000mg<br>⚠️ 과도한 당분 섭취 주의<br>💊 임신성 당뇨 검사 (24~28주)' :
+         '📌 철분제 꾸준히 복용<br>🥩 단백질 + 칼슘 강화<br>🍌 변비 예방 — 식이섬유 섭취<br>⚠️ 과식 주의 — 소량 자주 먹기<br>💧 부기 관리 — 저염식<br>📅 라즈베리 잎차 (36주~)') +
+      '</div></div>' +
+    '<div style="background:linear-gradient(135deg,#F0EBE4,#E8E0D8);border-radius:16px;padding:18px;">' +
+      '<div style="font-size:14px;font-weight:800;margin-bottom:8px;">💉 임산부 검진 체크</div>' +
+      '<div style="font-size:12px;line-height:2;color:var(--text);">' +
+        (pm <= 3 ? '✅ 임신 확인 초음파<br>✅ 혈액검사 (빈혈, 혈액형 등)<br>✅ 풍진항체 검사<br>📅 다음: 기형아 선별검사 (11~13주)<br>📅 다음: 1차 통합검사 (11~14주)' :
+         pm <= 6 ? '✅ 정밀 초음파 (20~24주)<br>✅ 임신성 당뇨 검사 (24~28주)<br>📅 다음: 태동 검사<br>📅 다음: Rh 항체 검사 (28주)' :
+         '✅ NST 태동 검사 (32주~)<br>✅ GBS 검사 (35~37주)<br>📅 매주 정기검진 (36주~)<br>📅 분만 계획 상담<br>📅 출산 입원 준비물 체크') +
+      '</div></div></div>';
+
+  // 프로필 since 텍스트
+  var since = document.querySelector('.prof-since');
+  if(since) since.textContent = '우주여행 준비 중 🚀 · ' + label + ' 예비맘';
+
+  // 프로필 팝업
+  var ppMeta = document.getElementById('ppMeta');
+  if(ppMeta) ppMeta.textContent = label + ' 예비맘 · 우주여행 준비 중';
+
+  // 알림 내용 교체
+  document.querySelectorAll('.noti-title').forEach(function(el){
+    el.textContent = el.textContent.replace(/11개월 라운지/g, label + ' 예비맘 라운지');
+  });
+
+  // 검색 최근 기록
+  var searchRecent = document.querySelector('.search-recent .text');
+  if(searchRecent) searchRecent.textContent = label + ' 태교';
+
+  // 육아정보 타이틀
+  var ipTitle = document.getElementById('ipTitle');
+  if(ipTitle) ipTitle.textContent = label + ' 예비맘을 위한 추천';
+
+  // 육아정보 CTA
+  var cta = document.getElementById('babyCta');
+  if(cta) cta.textContent = '📚 ' + label + ' 맞춤 임신정보 보기 →';
+
+  // 프로필 내 설정 월령 표시
+  var formMonth = document.querySelector('.form-input');
+  if(formMonth && formMonth.textContent.indexOf('개월') >= 0) formMonth.textContent = label;
 }
 
 // ═══════ 유저 프로필 팝업 ═══════
