@@ -1,6 +1,8 @@
 package com.jinyoung.sohangseong.data.repository
 
 import com.jinyoung.sohangseong.data.model.ApprovedItemDto
+import com.jinyoung.sohangseong.data.model.ApprovedItemDetailDto
+import com.jinyoung.sohangseong.data.model.CommunityPostDetailDto
 import com.jinyoung.sohangseong.data.model.CommunityPostDto
 import com.jinyoung.sohangseong.data.model.CreateCommentRequest
 import com.jinyoung.sohangseong.data.model.CreatePostRequest
@@ -15,6 +17,10 @@ class MainRepository(
 ) {
   suspend fun getPosts(): Result<List<CommunityPostDto>> = runCatching { mainApi.getPosts() }
 
+  suspend fun getPostDetail(postId: String): Result<CommunityPostDetailDto> = runCatching {
+    mainApi.getPostDetail(postId)
+  }
+
   suspend fun getPolls(): Result<List<VotePollDto>> = runCatching { mainApi.getPolls() }
 
   suspend fun getPollDetail(pollId: String): Result<VotePollDetailDto> {
@@ -22,6 +28,10 @@ class MainRepository(
   }
 
   suspend fun getApprovedItems(): Result<List<ApprovedItemDto>> = runCatching { mainApi.getApprovedItems() }
+
+  suspend fun getApprovedItemDetail(itemId: String): Result<ApprovedItemDetailDto> = runCatching {
+    mainApi.getApprovedItemDetail(itemId)
+  }
 
   suspend fun getProfileSummary(userId: String): Result<UserProfileSummaryDto> {
     return runCatching { mainApi.getProfileSummary(userId) }

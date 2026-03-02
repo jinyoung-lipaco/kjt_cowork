@@ -1,6 +1,8 @@
 package com.jinyoung.sohangseong.data.network
 
 import com.jinyoung.sohangseong.data.model.ApprovedItemDto
+import com.jinyoung.sohangseong.data.model.ApprovedItemDetailDto
+import com.jinyoung.sohangseong.data.model.CommunityPostDetailDto
 import com.jinyoung.sohangseong.data.model.CommunityPostDto
 import com.jinyoung.sohangseong.data.model.CreateCommentRequest
 import com.jinyoung.sohangseong.data.model.CreatePostRequest
@@ -17,6 +19,11 @@ interface MainApi {
   @GET("posts")
   suspend fun getPosts(): List<CommunityPostDto>
 
+  @GET("posts/{postId}")
+  suspend fun getPostDetail(
+    @Path("postId") postId: String
+  ): CommunityPostDetailDto
+
   @GET("standards/polls")
   suspend fun getPolls(): List<VotePollDto>
 
@@ -27,6 +34,11 @@ interface MainApi {
 
   @GET("standards/approved-items")
   suspend fun getApprovedItems(): List<ApprovedItemDto>
+
+  @GET("standards/approved-items/{itemId}")
+  suspend fun getApprovedItemDetail(
+    @Path("itemId") itemId: String
+  ): ApprovedItemDetailDto
 
   @GET("users/{userId}/profile-summary")
   suspend fun getProfileSummary(

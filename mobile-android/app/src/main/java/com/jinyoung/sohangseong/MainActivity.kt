@@ -114,7 +114,9 @@ class MainActivity : ComponentActivity() {
             scope.launch {
               authRepository.signOut()
             }
-          }
+          },
+          onConsumeErrorMessage = viewModel::consumeErrorMessage,
+          onConsumeInfoMessage = viewModel::consumeInfoMessage
         )
       } else {
         LaunchedEffect(savedUserId, savedNickname) {
@@ -144,7 +146,9 @@ class MainActivity : ComponentActivity() {
             scope.launch {
               authRepository.signOut()
             }
-          }
+          },
+          onConsumeErrorMessage = mainTabsViewModel::consumeErrorMessage,
+          onConsumeActionMessage = mainTabsViewModel::consumeActionMessage
         }
       }
     }

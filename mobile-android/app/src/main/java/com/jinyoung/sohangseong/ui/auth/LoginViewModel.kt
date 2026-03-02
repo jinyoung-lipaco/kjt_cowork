@@ -115,4 +115,12 @@ class LoginViewModel(
   fun setInfo(message: String) {
     _state.update { it.copy(infoMessage = message, errorMessage = null, loading = false, loadingProvider = null) }
   }
+
+  fun consumeErrorMessage() {
+    _state.update { it.copy(errorMessage = null) }
+  }
+
+  fun consumeInfoMessage() {
+    _state.update { it.copy(infoMessage = null) }
+  }
 }

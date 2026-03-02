@@ -3,6 +3,8 @@ package com.jinyoung.sohangseong.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jinyoung.sohangseong.data.model.ApprovedItemDto
+import com.jinyoung.sohangseong.data.model.ApprovedItemDetailDto
+import com.jinyoung.sohangseong.data.model.CommunityPostDetailDto
 import com.jinyoung.sohangseong.data.model.CommunityPostDto
 import com.jinyoung.sohangseong.data.model.UserProfileSummaryDto
 import com.jinyoung.sohangseong.data.model.VotePollDetailDto
@@ -30,8 +32,10 @@ data class MainTabsUiState(
   val actionMessage: String? = null,
   val posts: List<CommunityPostDto> = emptyList(),
   val polls: List<VotePollDto> = emptyList(),
+  val selectedPostDetail: CommunityPostDetailDto? = null,
   val selectedPollDetail: VotePollDetailDto? = null,
   val approvedItems: List<ApprovedItemDto> = emptyList(),
+  val selectedApprovedItemDetail: ApprovedItemDetailDto? = null,
   val profileSummary: UserProfileSummaryDto? = null
 )
 
@@ -48,17 +52,26 @@ class MainTabsViewModel(
         selectedPostId = null,
         selectedPollId = null,
         selectedApprovedItemId = null,
-        selectedPollDetail = null
+        selectedPostDetail = null,
+        selectedPollDetail = null,
+        selectedApprovedItemDetail = null
       )
     }
   }
 
   fun openPostDetail(postId: String) {
-    _state.update { it.copy(selectedTab = MainTab.COMMUNITY, selectedPostId = postId) }
+    _state.update {
+      it.copy(
+        selectedTab = MainTab.COMMUNITY,
+        selectedPostId = postId,
+        selectedPostDetail = null
+      )
+    }
+    loadPostDetail(postId)
   }
 
   fun closePostDetail() {
-    _state.update { it.copy(selectedPostId = null) }
+    _state.update { it.copy(selectedPostId = null, selectedPostDetail = null) }
   }
 
   fun openPollDetail(pollId: String) {
@@ -78,13 +91,22 @@ class MainTabsViewModel(
       it.copy(
         selectedTab = MainTab.STANDARDS,
         selectedApprovedItemId = itemId,
-        selectedPollId = null
+        selectedPollId = null,
+        selectedApprovedItemDetail = null
       )
     }
+    loadApprovedItemDetail(itemId)
   }
 
   fun closeStandardsDetail() {
-    _state.update { it.copy(selectedPollId = null, selectedApprovedItemId = null, selectedPollDetail = null) }
+    _state.update {
+      it.copy(
+        selectedPollId = null,
+        selectedApprovedItemId = null,
+        selectedPollDetail = null,
+        selectedApprovedItemDetail = null
+      )
+    }
   }
 
   fun refresh(userId: String) {
@@ -173,6 +195,7 @@ class MainTabsViewModel(
         .onSuccess {
           _state.update { it.copy(actionMessage = "댓글이 등록되었습니다.") }
           refresh(userId)
+          loadPostDetail(postId)
         }
         .onFailure { error ->
           _state.update {
@@ -201,6 +224,48 @@ class MainTabsViewModel(
           }
         }
     }
+  }
+
+  private fun loadPostDetail(postId: String) {
+    viewModelScope.launch {
+      repository.getPostDetail(postId)
+        .onSuccess { detail ->
+          _state.update { it.copy(selectedPostDetail = detail, errorMessage = null, isOffline = false) }
+        }
+        .onFailure { error ->
+          _state.update {
+            it.copy(
+              errorMessage = "게시글 상세 조회 실패: ${toUiErrorMessage(error, "알 수 없는 오류")}",
+              isOffline = isOfflineError(error)
+            )
+          }
+        }
+    }
+  }
+
+  private fun loadApprovedItemDetail(itemId: String) {
+    viewModelScope.launch {
+      repository.getApprovedItemDetail(itemId)
+        .onSuccess { detail ->
+          _state.update { it.copy(selectedApprovedItemDetail = detail, errorMessage = null, isOffline = false) }
+        }
+        .onFailure { error ->
+          _state.update {
+            it.copy(
+              errorMessage = "인정템 상세 조회 실패: ${toUiErrorMessage(error, "알 수 없는 오류")}",
+              isOffline = isOfflineError(error)
+            )
+          }
+        }
+    }
+  }
+
+  fun consumeErrorMessage() {
+    _state.update { it.copy(errorMessage = null) }
+  }
+
+  fun consumeActionMessage() {
+    _state.update { it.copy(actionMessage = null) }
   }
 
   private fun isOfflineError(error: Throwable?): Boolean {

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -19,8 +20,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -44,27 +49,64 @@ fun MainTabsScreen(
   onCreatePost: (title: String, body: String) -> Unit,
   onCreateComment: (postId: String, body: String) -> Unit,
   onVote: (pollId: String, optionId: String) -> Unit,
-  onSignOut: () -> Unit
+  onSignOut: () -> Unit,
+  onConsumeErrorMessage: () -> Unit,
+  onConsumeActionMessage: () -> Unit
 ) {
+  val snackbarHostState = remember { SnackbarHostState() }
+
+  LaunchedEffect(state.errorMessage) {
+    val message = state.errorMessage ?: return@LaunchedEffect
+    snackbarHostState.showSnackbar(message)
+    onConsumeErrorMessage()
+  }
+
+  LaunchedEffect(state.actionMessage) {
+    val message = state.actionMessage ?: return@LaunchedEffect
+    snackbarHostState.showSnackbar(message)
+    onConsumeActionMessage()
+  }
+
   Scaffold(
+    snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     bottomBar = {
-      NavigationBar {
+      NavigationBar(
+        modifier = Modifier.height(84.dp)
+      ) {
         NavigationBarItem(
+          modifier = Modifier.sizeIn(minHeight = 64.dp),
           selected = state.selectedTab == MainTab.COMMUNITY,
           onClick = { onSelectTab(MainTab.COMMUNITY) },
-          label = { Text("커뮤니티") },
+          label = {
+            Text(
+              text = "커뮤니티",
+              fontWeight = if (state.selectedTab == MainTab.COMMUNITY) FontWeight.Bold else FontWeight.Normal
+            )
+          },
           icon = { Text("💬") }
         )
         NavigationBarItem(
+          modifier = Modifier.sizeIn(minHeight = 64.dp),
           selected = state.selectedTab == MainTab.STANDARDS,
           onClick = { onSelectTab(MainTab.STANDARDS) },
-          label = { Text("스탠다드") },
+          label = {
+            Text(
+              text = "스탠다드",
+              fontWeight = if (state.selectedTab == MainTab.STANDARDS) FontWeight.Bold else FontWeight.Normal
+            )
+          },
           icon = { Text("🛡️") }
         )
         NavigationBarItem(
+          modifier = Modifier.sizeIn(minHeight = 64.dp),
           selected = state.selectedTab == MainTab.PROFILE,
           onClick = { onSelectTab(MainTab.PROFILE) },
-          label = { Text("프로필") },
+          label = {
+            Text(
+              text = "프로필",
+              fontWeight = if (state.selectedTab == MainTab.PROFILE) FontWeight.Bold else FontWeight.Normal
+            )
+          },
           icon = { Text("👤") }
         )
       }
@@ -77,30 +119,6 @@ fun MainTabsScreen(
         .padding(16.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-      if (state.errorMessage != null) {
-        Card(modifier = Modifier.fillMaxWidth()) {
-          Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(
-              text = "오류: ${state.errorMessage}",
-              color = MaterialTheme.colorScheme.error,
-              style = MaterialTheme.typography.bodySmall
-            )
-            Button(
-              onClick = onRefresh,
-              enabled = !state.loading,
-              modifier = Modifier.fillMaxWidth()
-            ) {
-              Text(if (state.loading) "재시도 중..." else "다시 시도")
-            }
-          }
-        }
-      }
-      if (state.actionMessage != null) {
-        Text(
-          text = state.actionMessage,
-          color = MaterialTheme.colorScheme.primary
-        )
-      }
       if (state.isOffline) {
         Text(
           text = "오프라인 모드: 네트워크 복구 후 다시 시도해 주세요.",
@@ -152,7 +170,19 @@ private fun CommunityTab(
   var title by remember { mutableStateOf("") }
   var body by remember { mutableStateOf("") }
   val commentInputs = remember { mutableStateMapOf<String, String>() }
-  val selectedPost = state.posts.firstOrNull { it.id == state.selectedPostId }
+  val selectedPost = state.selectedPostDetail
+
+  if (state.selectedPostId != null && selectedPost == null) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+      Text(
+        text = "게시글 상세 정보를 불러오는 중입니다.",
+        modifier = Modifier.padding(12.dp),
+        style = MaterialTheme.typography.bodySmall
+      )
+    }
+    Button(onClick = onClosePostDetail, modifier = Modifier.fillMaxWidth()) { Text("목록으로") }
+    return
+  }
 
   if (selectedPost != null) {
     CommunityPostDetail(
@@ -262,7 +292,7 @@ private fun StandardsTab(
   onCloseDetail: () -> Unit
 ) {
   val selectedPoll = state.selectedPollDetail
-  val selectedItem = state.approvedItems.firstOrNull { it.id == state.selectedApprovedItemId }
+  val selectedItem = state.selectedApprovedItemDetail
 
   if (selectedPoll != null) {
     PollDetail(
@@ -271,6 +301,18 @@ private fun StandardsTab(
       onVote = { optionId -> onVote(selectedPoll.id, optionId) },
       onBack = onCloseDetail
     )
+    return
+  }
+
+  if (state.selectedApprovedItemId != null && selectedItem == null) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+      Text(
+        text = "인정템 상세 정보를 불러오는 중입니다.",
+        modifier = Modifier.padding(12.dp),
+        style = MaterialTheme.typography.bodySmall
+      )
+    }
+    Button(onClick = onCloseDetail, modifier = Modifier.fillMaxWidth()) { Text("목록으로") }
     return
   }
 
@@ -439,7 +481,7 @@ private fun EmptyStateCard(message: String) {
 @Composable
 private fun CommunityPostDetail(
   state: MainTabsUiState,
-  post: com.jinyoung.sohangseong.data.model.CommunityPostDto,
+  post: com.jinyoung.sohangseong.data.model.CommunityPostDetailDto,
   commentInput: String,
   onCommentInputChanged: (String) -> Unit,
   onCreateComment: () -> Unit,
@@ -451,7 +493,10 @@ private fun CommunityPostDetail(
       Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(post.title, style = MaterialTheme.typography.titleMedium)
         Text(post.body, style = MaterialTheme.typography.bodyMedium)
-        Text("작성자 ${post.author.nickname}", style = MaterialTheme.typography.bodySmall)
+        Text(
+          "작성자 ${post.author.nickname} · ${post.author.tier} · ${post.createdAt.take(10)}",
+          style = MaterialTheme.typography.bodySmall
+        )
         Text("댓글 ${post.comments.size}개", style = MaterialTheme.typography.bodySmall)
       }
     }
@@ -461,7 +506,10 @@ private fun CommunityPostDetail(
           Text("- 아직 댓글이 없습니다.", style = MaterialTheme.typography.bodySmall)
         } else {
           post.comments.forEach { comment ->
-            Text("• ${comment.body}", style = MaterialTheme.typography.bodySmall)
+            Text(
+              "• ${comment.author.nickname} · ${comment.createdAt.take(10)}\n${comment.body}",
+              style = MaterialTheme.typography.bodySmall
+            )
           }
         }
         OutlinedTextField(
@@ -535,7 +583,7 @@ private fun PollDetail(
 
 @Composable
 private fun ApprovedItemDetail(
-  item: com.jinyoung.sohangseong.data.model.ApprovedItemDto,
+  item: com.jinyoung.sohangseong.data.model.ApprovedItemDetailDto,
   onBack: () -> Unit
 ) {
   Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -547,6 +595,9 @@ private fun ApprovedItemDetail(
         Text("브랜드: ${item.brand ?: "브랜드 미표기"}")
         Text("안전 점수: ${item.safetyScore}")
         Text("가격: ${item.priceText ?: "가격 정보 없음"}")
+        Text("상태: ${item.status}")
+        Text("등록일: ${item.createdAt.take(10)}")
+        Text("기준 설명: ${item.criteriaText ?: "상세 기준 설명 없음"}")
       }
     }
   }

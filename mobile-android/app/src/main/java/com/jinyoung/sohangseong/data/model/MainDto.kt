@@ -10,6 +10,28 @@ data class PostCommentDto(
   val body: String
 )
 
+data class PostDetailAuthorDto(
+  val id: String,
+  val nickname: String,
+  val tier: String
+)
+
+data class PostDetailCommentDto(
+  val id: String,
+  val body: String,
+  val createdAt: String,
+  val author: PostDetailAuthorDto
+)
+
+data class CommunityPostDetailDto(
+  val id: String,
+  val title: String,
+  val body: String,
+  val createdAt: String,
+  val author: PostDetailAuthorDto,
+  val comments: List<PostDetailCommentDto>
+)
+
 data class CommunityPostDto(
   val id: String,
   val title: String,
@@ -56,6 +78,18 @@ data class ApprovedItemDto(
   val brand: String?,
   val safetyScore: Int,
   val priceText: String?
+)
+
+data class ApprovedItemDetailDto(
+  val id: String,
+  val category: String,
+  val name: String,
+  val brand: String?,
+  val safetyScore: Int,
+  val priceText: String?,
+  val criteriaText: String?,
+  val status: String,
+  val createdAt: String
 )
 
 data class CreatePostRequest(
