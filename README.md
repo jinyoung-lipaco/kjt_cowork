@@ -30,6 +30,13 @@ npm run dev
 - `GET /api/posts`
 - `POST /api/posts`
 - `POST /api/posts/comments`
+- `GET /api/standards/polls`
+- `GET /api/standards/polls/:pollId`
+- `POST /api/standards/polls`
+- `POST /api/standards/polls/:pollId/vote`
+- `GET /api/standards/approved-items`
+- `GET /api/standards/approved-items/:itemId`
+- `POST /api/standards/approved-items`
 
 ## 다음 우선순위
 1. 소셜 로그인(카카오/구글) 추가

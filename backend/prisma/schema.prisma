@@ -14,6 +14,11 @@ enum UserTier {
   CERTIFIED
 }
 
+enum PollStatus {
+  LIVE
+  CLOSED
+}
+
 model User {
   id            String      @id @default(cuid())
   email         String      @unique
@@ -24,6 +29,7 @@ model User {
   updatedAt     DateTime    @updatedAt
   posts         Post[]
   comments      Comment[]
+  voteAnswers   VoteAnswer[]
 }
 
 model Post {
@@ -45,4 +51,59 @@ model Comment {
   createdAt  DateTime    @default(now())
   post       Post        @relation(fields: [postId], references: [id], onDelete: Cascade)
   author     User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model VotePoll {
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  status       PollStatus   @default(LIVE)
+  closesAt     DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  options      VoteOption[]
+  answers      VoteAnswer[]
+
+  @@index([status, createdAt])
+}
+
+model VoteOption {
+  id           String       @id @default(cuid())
+  pollId       String
+  label        String
+  sortOrder    Int          @default(0)
+  createdAt    DateTime     @default(now())
+  poll         VotePoll     @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  answers      VoteAnswer[]
+
+  @@index([pollId, sortOrder])
+}
+
+model VoteAnswer {
+  id           String       @id @default(cuid())
+  pollId       String
+  optionId     String
+  userId       String
+  createdAt    DateTime     @default(now())
+  poll         VotePoll     @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option       VoteOption   @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId])
+  @@index([optionId])
+}
+
+model ApprovedItem {
+  id             String      @id @default(cuid())
+  category       String
+  name           String
+  brand          String?
+  safetyScore    Int
+  priceText      String?
+  criteriaText   String?
+  status         String      @default("APPROVED")
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([category, createdAt])
 }
