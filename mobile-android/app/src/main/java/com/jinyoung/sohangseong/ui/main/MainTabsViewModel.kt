@@ -21,6 +21,11 @@ enum class MainTab {
   COMMUNITY, STANDARDS, PROFILE
 }
 
+enum class SnackbarActionType {
+  OPEN_POST_DETAIL,
+  OPEN_POLL_DETAIL
+}
+
 data class MainTabsUiState(
   val selectedTab: MainTab = MainTab.COMMUNITY,
   val selectedPostId: String? = null,
@@ -30,6 +35,8 @@ data class MainTabsUiState(
   val loading: Boolean = false,
   val errorMessage: String? = null,
   val actionMessage: String? = null,
+  val actionType: SnackbarActionType? = null,
+  val actionTargetId: String? = null,
   val posts: List<CommunityPostDto> = emptyList(),
   val polls: List<VotePollDto> = emptyList(),
   val selectedPostDetail: CommunityPostDetailDto? = null,
@@ -146,8 +153,14 @@ class MainTabsViewModel(
     viewModelScope.launch {
       _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null, isOffline = false) }
       repository.createPost(userId, title, body)
-        .onSuccess {
-          _state.update { it.copy(actionMessage = "글이 등록되었습니다.") }
+        .onSuccess { createdPost ->
+          _state.update {
+            it.copy(
+              actionMessage = "글이 등록되었습니다.",
+              actionType = SnackbarActionType.OPEN_POST_DETAIL,
+              actionTargetId = createdPost.id
+            )
+          }
           refresh(userId)
         }
         .onFailure { error ->
@@ -167,7 +180,13 @@ class MainTabsViewModel(
       _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null, isOffline = false) }
       repository.votePoll(userId, pollId, optionId)
         .onSuccess {
-          _state.update { it.copy(actionMessage = "투표가 반영되었습니다.") }
+          _state.update {
+            it.copy(
+              actionMessage = "투표가 반영되었습니다.",
+              actionType = SnackbarActionType.OPEN_POLL_DETAIL,
+              actionTargetId = pollId
+            )
+          }
           refresh(userId)
           loadPollDetail(pollId)
         }
@@ -193,7 +212,13 @@ class MainTabsViewModel(
       _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null, isOffline = false) }
       repository.createComment(userId = userId, postId = postId, body = body)
         .onSuccess {
-          _state.update { it.copy(actionMessage = "댓글이 등록되었습니다.") }
+          _state.update {
+            it.copy(
+              actionMessage = "댓글이 등록되었습니다.",
+              actionType = SnackbarActionType.OPEN_POST_DETAIL,
+              actionTargetId = postId
+            )
+          }
           refresh(userId)
           loadPostDetail(postId)
         }
@@ -224,7 +249,13 @@ class MainTabsViewModel(
       _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null, isOffline = false) }
       repository.updateProfileNickname(userId = userId, nickname = trimmed)
         .onSuccess {
-          _state.update { it.copy(actionMessage = "닉네임이 변경되었습니다.") }
+          _state.update {
+            it.copy(
+              actionMessage = "닉네임이 변경되었습니다.",
+              actionType = null,
+              actionTargetId = null
+            )
+          }
           refresh(userId)
         }
         .onFailure { error ->
@@ -295,7 +326,7 @@ class MainTabsViewModel(
   }
 
   fun consumeActionMessage() {
-    _state.update { it.copy(actionMessage = null) }
+    _state.update { it.copy(actionMessage = null, actionType = null, actionTargetId = null) }
   }
 
   private fun isOfflineError(error: Throwable?): Boolean {

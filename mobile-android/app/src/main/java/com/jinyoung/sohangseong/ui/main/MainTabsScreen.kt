@@ -78,13 +78,30 @@ fun MainTabsScreen(
 
   LaunchedEffect(state.actionMessage) {
     val message = state.actionMessage ?: return@LaunchedEffect
-    snackbarHostState.showSnackbar(
+    val actionLabel = when (state.actionType) {
+      SnackbarActionType.OPEN_POST_DETAIL -> "보기"
+      SnackbarActionType.OPEN_POLL_DETAIL -> "결과"
+      null -> null
+    }
+    val result = snackbarHostState.showSnackbar(
       AppSnackbarVisuals(
         message = message,
         type = AppSnackbarType.SUCCESS,
+        actionLabel = actionLabel,
         duration = SnackbarDuration.Short
       )
     )
+    if (result == SnackbarResult.ActionPerformed && !state.loading) {
+      when (state.actionType) {
+        SnackbarActionType.OPEN_POST_DETAIL -> {
+          state.actionTargetId?.let(onOpenPostDetail)
+        }
+        SnackbarActionType.OPEN_POLL_DETAIL -> {
+          state.actionTargetId?.let(onOpenPollDetail)
+        }
+        null -> Unit
+      }
+    }
     onConsumeActionMessage()
   }
 
