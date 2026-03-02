@@ -30,6 +30,8 @@ model User {
   email         String      @unique
   passwordHash  String?
   nickname      String
+  bio           String?
+  interestCategories String[] @default([])
   tier          UserTier    @default(SEED_MOM)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt

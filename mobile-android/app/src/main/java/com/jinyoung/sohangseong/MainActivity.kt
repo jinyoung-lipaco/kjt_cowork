@@ -148,8 +148,13 @@ class MainActivity : ComponentActivity() {
           onVote = { pollId, optionId ->
             mainTabsViewModel.vote(savedUserId ?: "", pollId, optionId)
           },
-          onUpdateProfileNickname = { newNickname ->
-            mainTabsViewModel.updateProfileNickname(savedUserId ?: "", newNickname)
+          onUpdateProfile = { newNickname, newBio, newInterests ->
+            mainTabsViewModel.updateProfile(
+              userId = savedUserId ?: "",
+              nickname = newNickname,
+              bio = newBio,
+              interestCategories = newInterests
+            )
           },
           onSignOut = {
             scope.launch {
@@ -158,7 +163,7 @@ class MainActivity : ComponentActivity() {
           },
           onConsumeErrorMessage = mainTabsViewModel::consumeErrorMessage,
           onConsumeActionMessage = mainTabsViewModel::consumeActionMessage
-        }
+        )
       }
     }
   }

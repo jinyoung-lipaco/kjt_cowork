@@ -53,7 +53,7 @@ fun MainTabsScreen(
   onCreatePost: (title: String, body: String) -> Unit,
   onCreateComment: (postId: String, body: String) -> Unit,
   onVote: (pollId: String, optionId: String) -> Unit,
-  onUpdateProfileNickname: (String) -> Unit,
+  onUpdateProfile: (nickname: String, bio: String, interestCategories: List<String>) -> Unit,
   onSignOut: () -> Unit,
   onConsumeErrorMessage: () -> Unit,
   onConsumeActionMessage: () -> Unit
@@ -195,7 +195,7 @@ fun MainTabsScreen(
           userId = userId,
           nickname = nickname,
           state = state,
-          onUpdateProfileNickname = onUpdateProfileNickname
+          onUpdateProfile = onUpdateProfile
         )
       }
     }
@@ -447,17 +447,30 @@ private fun ProfileTab(
   userId: String,
   nickname: String,
   state: MainTabsUiState,
-  onUpdateProfileNickname: (String) -> Unit
+  onUpdateProfile: (nickname: String, bio: String, interestCategories: List<String>) -> Unit
 ) {
   val summary = state.profileSummary
   var nicknameInput by remember(summary?.nickname, nickname) {
     mutableStateOf(summary?.nickname ?: nickname)
   }
+  var bioInput by remember(summary?.bio) {
+    mutableStateOf(summary?.bio.orEmpty())
+  }
+  var interestsInput by remember(summary?.interestCategories) {
+    mutableStateOf(summary?.interestCategories?.joinToString(", ").orEmpty())
+  }
   val currentNickname = summary?.nickname ?: nickname
   val trimmedNicknameInput = nicknameInput.trim()
+  val trimmedBioInput = bioInput.trim()
+  val parsedInterests = interestsInput.split(",").map { it.trim() }.filter { it.isNotBlank() }.distinct()
+  val currentInterests = summary?.interestCategories.orEmpty()
   val hasNicknameChanged = trimmedNicknameInput != currentNickname.trim()
+  val hasBioChanged = trimmedBioInput != summary?.bio.orEmpty().trim()
+  val hasInterestsChanged = parsedInterests != currentInterests
   val isNicknameLengthValid = trimmedNicknameInput.length in 2..20
-  val canSubmitNickname = !state.loading && hasNicknameChanged && isNicknameLengthValid
+  val isBioLengthValid = trimmedBioInput.length <= 120
+  val hasProfileChanged = hasNicknameChanged || hasBioChanged || hasInterestsChanged
+  val canSubmitProfile = !state.loading && hasProfileChanged && isNicknameLengthValid && isBioLengthValid
 
   Card(modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -474,6 +487,8 @@ private fun ProfileTab(
 
       Text("사용자 ID: ${summary?.id ?: userId}")
       Text("닉네임: ${summary?.nickname ?: nickname}")
+      Text("소개: ${summary?.bio?.takeIf { it.isNotBlank() } ?: "-"}")
+      Text("관심 카테고리: ${summary?.interestCategories?.joinToString(", ") ?: "-"}")
       Text("이메일: ${summary?.email ?: "-"}")
       Text("등급: ${summary?.tier ?: "-"}")
       OutlinedTextField(
@@ -485,26 +500,42 @@ private fun ProfileTab(
         enabled = !state.loading,
         isError = nicknameInput.isNotBlank() && !isNicknameLengthValid
       )
+      OutlinedTextField(
+        value = bioInput,
+        onValueChange = { bioInput = it },
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text("소개") },
+        enabled = !state.loading,
+        isError = !isBioLengthValid
+      )
+      OutlinedTextField(
+        value = interestsInput,
+        onValueChange = { interestsInput = it },
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text("관심 카테고리(쉼표로 구분)") },
+        enabled = !state.loading
+      )
       Text(
         text = when {
           nicknameInput.isBlank() -> "닉네임을 입력해 주세요. (2~20자)"
           !isNicknameLengthValid -> "닉네임은 2~20자여야 합니다."
-          !hasNicknameChanged -> "변경된 내용이 없습니다."
-          else -> "저장 가능한 닉네임입니다."
+          !isBioLengthValid -> "소개글은 120자 이하로 입력해 주세요."
+          !hasProfileChanged -> "변경된 내용이 없습니다."
+          else -> "저장 가능한 프로필 변경입니다."
         },
         style = MaterialTheme.typography.bodySmall,
-        color = if (nicknameInput.isNotBlank() && !isNicknameLengthValid) {
+        color = if ((nicknameInput.isNotBlank() && !isNicknameLengthValid) || !isBioLengthValid) {
           MaterialTheme.colorScheme.error
         } else {
           MaterialTheme.colorScheme.onSurfaceVariant
         }
       )
       Button(
-        onClick = { onUpdateProfileNickname(trimmedNicknameInput) },
-        enabled = canSubmitNickname,
+        onClick = { onUpdateProfile(trimmedNicknameInput, trimmedBioInput, parsedInterests) },
+        enabled = canSubmitProfile,
         modifier = Modifier.fillMaxWidth()
       ) {
-        Text(if (state.loading) "저장 중..." else "닉네임 저장")
+        Text(if (state.loading) "저장 중..." else "프로필 저장")
       }
       Text("가입일: ${summary?.createdAt?.take(10) ?: "-"}")
       Text("커뮤니티 글: ${summary?.stats?.postCount ?: state.posts.size}개")

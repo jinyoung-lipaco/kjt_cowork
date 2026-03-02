@@ -6,7 +6,20 @@ import { isNicknameTaken, validateNicknamePolicy } from "./nickname.policy.js";
 export async function userRoutes(app: FastifyInstance) {
   app.patch("/users/:userId/profile", async (request, reply) => {
     const params = z.object({ userId: z.string().min(1) }).parse(request.params);
-    const body = z.object({ nickname: z.string().trim().min(2).max(20) }).parse(request.body);
+    const body = z
+      .object({
+        nickname: z.string().trim().min(2).max(20).optional(),
+        bio: z.string().trim().max(120).nullable().optional(),
+        interestCategories: z.array(z.string().trim().min(2).max(20)).max(8).optional()
+      })
+      .refine(
+        (value) =>
+          value.nickname !== undefined ||
+          value.bio !== undefined ||
+          value.interestCategories !== undefined,
+        { message: "변경할 프로필 항목이 필요합니다." }
+      )
+      .parse(request.body);
 
     const user = await prisma.user.findUnique({
       where: { id: params.userId },
@@ -17,20 +30,35 @@ export async function userRoutes(app: FastifyInstance) {
       return reply.code(404).send({ message: "사용자를 찾을 수 없습니다." });
     }
 
-    const nicknameError = validateNicknamePolicy(body.nickname);
-    if (nicknameError) {
-      return reply.code(400).send({ message: nicknameError });
-    }
+    if (body.nickname !== undefined) {
+      const nicknameError = validateNicknamePolicy(body.nickname);
+      if (nicknameError) {
+        return reply.code(400).send({ message: nicknameError });
+      }
 
-    const nicknameTaken = await isNicknameTaken(body.nickname, params.userId);
-    if (nicknameTaken) {
-      return reply.code(409).send({ message: "이미 사용 중인 닉네임입니다." });
+      const nicknameTaken = await isNicknameTaken(body.nickname, params.userId);
+      if (nicknameTaken) {
+        return reply.code(409).send({ message: "이미 사용 중인 닉네임입니다." });
+      }
     }
 
     const updated = await prisma.user.update({
       where: { id: params.userId },
-      data: { nickname: body.nickname },
-      select: { id: true, nickname: true, tier: true, updatedAt: true }
+      data: {
+        ...(body.nickname !== undefined ? { nickname: body.nickname } : {}),
+        ...(body.bio !== undefined ? { bio: body.bio?.trim() ? body.bio : null } : {}),
+        ...(body.interestCategories !== undefined
+          ? { interestCategories: Array.from(new Set(body.interestCategories)) }
+          : {})
+      },
+      select: {
+        id: true,
+        nickname: true,
+        bio: true,
+        interestCategories: true,
+        tier: true,
+        updatedAt: true
+      }
     });
 
     return updated;
@@ -45,6 +73,8 @@ export async function userRoutes(app: FastifyInstance) {
         id: true,
         email: true,
         nickname: true,
+        bio: true,
+        interestCategories: true,
         tier: true,
         createdAt: true,
         _count: {
@@ -101,6 +131,8 @@ export async function userRoutes(app: FastifyInstance) {
       id: user.id,
       email: user.email,
       nickname: user.nickname,
+      bio: user.bio,
+      interestCategories: user.interestCategories,
       tier: user.tier,
       createdAt: user.createdAt,
       stats: {

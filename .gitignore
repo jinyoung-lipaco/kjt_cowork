@@ -13,3 +13,7 @@ backend/node_modules
 backend/dist
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
+mobile-android/.gradle
+mobile-android/build
+mobile-android/app/build
+mobile-android/local.properties

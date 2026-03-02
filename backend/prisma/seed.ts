@@ -8,23 +8,37 @@ async function seedUsers() {
 
   const seedMom = await prisma.user.upsert({
     where: { email: "seedmom@sohangseong.dev" },
-    update: { nickname: "씨앗맘", tier: UserTier.SEED_MOM },
+    update: {
+      nickname: "씨앗맘",
+      tier: UserTier.SEED_MOM,
+      bio: "성분 꼼꼼맘, 피부 저자극 제품 위주로 찾고 있어요.",
+      interestCategories: ["스킨케어", "세정", "구강"]
+    },
     create: {
       email: "seedmom@sohangseong.dev",
       nickname: "씨앗맘",
       tier: UserTier.SEED_MOM,
-      passwordHash: defaultPasswordHash
+      passwordHash: defaultPasswordHash,
+      bio: "성분 꼼꼼맘, 피부 저자극 제품 위주로 찾고 있어요.",
+      interestCategories: ["스킨케어", "세정", "구강"]
     }
   });
 
   const starMom = await prisma.user.upsert({
     where: { email: "starmom@sohangseong.dev" },
-    update: { nickname: "별맘", tier: UserTier.STAR_MOM },
+    update: {
+      nickname: "별맘",
+      tier: UserTier.STAR_MOM,
+      bio: "별똥별맘 활동 중, 유아 구강/위생 카테고리에 관심이 많아요.",
+      interestCategories: ["구강", "위생", "리빙"]
+    },
     create: {
       email: "starmom@sohangseong.dev",
       nickname: "별맘",
       tier: UserTier.STAR_MOM,
-      passwordHash: defaultPasswordHash
+      passwordHash: defaultPasswordHash,
+      bio: "별똥별맘 활동 중, 유아 구강/위생 카테고리에 관심이 많아요.",
+      interestCategories: ["구강", "위생", "리빙"]
     }
   });
 

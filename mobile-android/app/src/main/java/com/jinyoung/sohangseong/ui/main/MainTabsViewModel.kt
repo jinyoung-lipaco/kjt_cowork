@@ -234,24 +234,41 @@ class MainTabsViewModel(
     }
   }
 
-  fun updateProfileNickname(userId: String, nickname: String) {
-    val trimmed = nickname.trim()
-    if (trimmed.length < 2) {
+  fun updateProfile(
+    userId: String,
+    nickname: String,
+    bio: String,
+    interestCategories: List<String>
+  ) {
+    val trimmedNickname = nickname.trim()
+    val trimmedBio = bio.trim()
+    val normalizedInterests = interestCategories.map { it.trim() }.filter { it.isNotBlank() }.distinct()
+
+    if (trimmedNickname.length < 2) {
       _state.update { it.copy(errorMessage = "닉네임은 2자 이상 입력해 주세요.") }
       return
     }
-    if (trimmed.length > 20) {
+    if (trimmedNickname.length > 20) {
       _state.update { it.copy(errorMessage = "닉네임은 20자 이하로 입력해 주세요.") }
+      return
+    }
+    if (trimmedBio.length > 120) {
+      _state.update { it.copy(errorMessage = "소개글은 120자 이하로 입력해 주세요.") }
       return
     }
 
     viewModelScope.launch {
       _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null, isOffline = false) }
-      repository.updateProfileNickname(userId = userId, nickname = trimmed)
+      repository.updateProfile(
+        userId = userId,
+        nickname = trimmedNickname,
+        bio = trimmedBio,
+        interestCategories = normalizedInterests
+      )
         .onSuccess {
           _state.update {
             it.copy(
-              actionMessage = "닉네임이 변경되었습니다.",
+              actionMessage = "프로필이 변경되었습니다.",
               actionType = null,
               actionTargetId = null
             )
@@ -262,7 +279,7 @@ class MainTabsViewModel(
           _state.update {
             it.copy(
               loading = false,
-              errorMessage = toProfileNicknameErrorMessage(error),
+              errorMessage = toProfileUpdateErrorMessage(error),
               isOffline = isOfflineError(error)
             )
           }
@@ -346,8 +363,8 @@ class MainTabsViewModel(
     }
   }
 
-  private fun toProfileNicknameErrorMessage(error: Throwable?): String {
-    val message = toUiErrorMessage(error, "닉네임 변경에 실패했습니다.")
+  private fun toProfileUpdateErrorMessage(error: Throwable?): String {
+    val message = toUiErrorMessage(error, "프로필 변경에 실패했습니다.")
     return when {
       message.contains("이미 사용 중인 닉네임") ->
         "이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해 주세요."
@@ -355,6 +372,8 @@ class MainTabsViewModel(
         "금칙어가 포함된 닉네임은 사용할 수 없습니다."
       message.contains("2~20자") || message.contains("2자") || message.contains("20자") ->
         "닉네임은 2~20자로 입력해 주세요."
+      message.contains("120자") ->
+        "소개글은 120자 이하로 입력해 주세요."
       else -> message
     }
   }

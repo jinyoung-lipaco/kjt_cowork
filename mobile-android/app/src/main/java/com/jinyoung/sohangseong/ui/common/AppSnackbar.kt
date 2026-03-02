@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.unit.dp
 import androidx.compose.material3.SnackbarVisuals
 
 enum class AppSnackbarType {
@@ -51,7 +50,6 @@ private fun AppSnackbar(data: SnackbarData) {
     containerColor = containerColor,
     contentColor = contentColor,
     actionColor = contentColor,
-    shape = MaterialTheme.shapes.medium,
-    tonalElevation = 2.dp
+    shape = MaterialTheme.shapes.medium
   )
 }

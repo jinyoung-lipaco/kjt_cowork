@@ -41,11 +41,23 @@ class MainRepository(
     return runCatching { mainApi.getProfileSummary(userId) }
   }
 
-  suspend fun updateProfileNickname(userId: String, nickname: String): Result<UpdateProfileResponseDto> {
+  suspend fun updateProfile(
+    userId: String,
+    nickname: String? = null,
+    bio: String? = null,
+    interestCategories: List<String>? = null
+  ): Result<UpdateProfileResponseDto> {
     return runCatching {
-      mainApi.updateProfile(userId = userId, body = UpdateProfileRequest(nickname = nickname.trim()))
+      mainApi.updateProfile(
+        userId = userId,
+        body = UpdateProfileRequest(
+          nickname = nickname?.trim(),
+          bio = bio?.trim(),
+          interestCategories = interestCategories
+        )
+      )
     }.recoverCatching { error ->
-      throw mapApiException(error, "닉네임 변경에 실패했습니다.")
+      throw mapApiException(error, "프로필 변경에 실패했습니다.")
     }
   }
 

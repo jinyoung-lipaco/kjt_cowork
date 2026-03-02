@@ -110,12 +110,16 @@ data class CreateCommentRequest(
 )
 
 data class UpdateProfileRequest(
-  val nickname: String
+  val nickname: String? = null,
+  val bio: String? = null,
+  val interestCategories: List<String>? = null
 )
 
 data class UpdateProfileResponseDto(
   val id: String,
   val nickname: String,
+  val bio: String?,
+  val interestCategories: List<String>,
   val tier: String,
   val updatedAt: String
 )
@@ -157,6 +161,8 @@ data class UserProfileSummaryDto(
   val id: String,
   val email: String,
   val nickname: String,
+  val bio: String?,
+  val interestCategories: List<String>,
   val tier: String,
   val createdAt: String,
   val stats: UserProfileStatsDto,
