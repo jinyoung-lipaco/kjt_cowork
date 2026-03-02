@@ -91,14 +91,14 @@ class MainActivity : ComponentActivity() {
         )
       } else {
         LaunchedEffect(savedUserId, savedNickname) {
-          mainTabsViewModel.refresh()
+          mainTabsViewModel.refresh(savedUserId ?: "")
         }
         MainTabsScreen(
           state = mainTabsState,
           userId = savedUserId ?: "",
           nickname = savedNickname ?: "",
           onSelectTab = mainTabsViewModel::selectTab,
-          onRefresh = mainTabsViewModel::refresh,
+          onRefresh = { mainTabsViewModel.refresh(savedUserId ?: "") },
           onCreatePost = { title, body ->
             mainTabsViewModel.createPost(savedUserId ?: "", title, body)
           },

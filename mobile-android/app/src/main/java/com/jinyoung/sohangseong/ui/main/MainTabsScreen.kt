@@ -243,13 +243,17 @@ private fun StandardsTab(
 
 @Composable
 private fun ProfileTab(userId: String, nickname: String, state: MainTabsUiState) {
+  val summary = state.profileSummary
   Card(modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Text("프로필", style = MaterialTheme.typography.titleMedium)
-      Text("사용자 ID: $userId")
-      Text("닉네임: $nickname")
-      Text("커뮤니티 글: ${state.posts.size}개")
-      Text("진행/종료 투표: ${state.polls.size}개")
+      Text("사용자 ID: ${summary?.id ?: userId}")
+      Text("닉네임: ${summary?.nickname ?: nickname}")
+      Text("이메일: ${summary?.email ?: "-"}")
+      Text("등급: ${summary?.tier ?: "-"}")
+      Text("커뮤니티 글: ${summary?.stats?.postCount ?: state.posts.size}개")
+      Text("작성 댓글: ${summary?.stats?.commentCount ?: 0}개")
+      Text("참여 투표: ${summary?.stats?.voteCount ?: 0}개")
       Text("인정템: ${state.approvedItems.size}개")
     }
   }

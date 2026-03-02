@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jinyoung.sohangseong.data.model.ApprovedItemDto
 import com.jinyoung.sohangseong.data.model.CommunityPostDto
+import com.jinyoung.sohangseong.data.model.UserProfileSummaryDto
 import com.jinyoung.sohangseong.data.model.VotePollDto
 import com.jinyoung.sohangseong.data.repository.MainRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,8 @@ data class MainTabsUiState(
   val actionMessage: String? = null,
   val posts: List<CommunityPostDto> = emptyList(),
   val polls: List<VotePollDto> = emptyList(),
-  val approvedItems: List<ApprovedItemDto> = emptyList()
+  val approvedItems: List<ApprovedItemDto> = emptyList(),
+  val profileSummary: UserProfileSummaryDto? = null
 )
 
 class MainTabsViewModel(
@@ -32,25 +34,23 @@ class MainTabsViewModel(
   private val _state = MutableStateFlow(MainTabsUiState())
   val state: StateFlow<MainTabsUiState> = _state.asStateFlow()
 
-  init {
-    refresh()
-  }
-
   fun selectTab(tab: MainTab) {
     _state.update { it.copy(selectedTab = tab) }
   }
 
-  fun refresh() {
+  fun refresh(userId: String) {
     viewModelScope.launch {
       _state.update { it.copy(loading = true, errorMessage = null) }
 
       val postsResult = repository.getPosts()
       val pollsResult = repository.getPolls()
       val itemsResult = repository.getApprovedItems()
+      val profileResult = repository.getProfileSummary(userId)
 
       val error = postsResult.exceptionOrNull()
         ?: pollsResult.exceptionOrNull()
         ?: itemsResult.exceptionOrNull()
+        ?: profileResult.exceptionOrNull()
 
       _state.update {
         it.copy(
@@ -58,7 +58,8 @@ class MainTabsViewModel(
           errorMessage = error?.message,
           posts = postsResult.getOrDefault(emptyList()),
           polls = pollsResult.getOrDefault(emptyList()),
-          approvedItems = itemsResult.getOrDefault(emptyList())
+          approvedItems = itemsResult.getOrDefault(emptyList()),
+          profileSummary = profileResult.getOrNull()
         )
       }
     }
@@ -75,7 +76,7 @@ class MainTabsViewModel(
       repository.createPost(userId, title, body)
         .onSuccess {
           _state.update { it.copy(actionMessage = "글이 등록되었습니다.") }
-          refresh()
+          refresh(userId)
         }
         .onFailure { error ->
           _state.update {
@@ -94,7 +95,7 @@ class MainTabsViewModel(
       repository.votePoll(userId, pollId, optionId)
         .onSuccess {
           _state.update { it.copy(actionMessage = "투표가 반영되었습니다.") }
-          refresh()
+          refresh(userId)
         }
         .onFailure { error ->
           _state.update {
@@ -118,7 +119,7 @@ class MainTabsViewModel(
       repository.createComment(userId = userId, postId = postId, body = body)
         .onSuccess {
           _state.update { it.copy(actionMessage = "댓글이 등록되었습니다.") }
-          refresh()
+          refresh(userId)
         }
         .onFailure { error ->
           _state.update {

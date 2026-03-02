@@ -58,3 +58,18 @@ data class CreateCommentRequest(
   val authorId: String,
   val body: String
 )
+
+data class UserProfileStatsDto(
+  val postCount: Int,
+  val commentCount: Int,
+  val voteCount: Int
+)
+
+data class UserProfileSummaryDto(
+  val id: String,
+  val email: String,
+  val nickname: String,
+  val tier: String,
+  val createdAt: String,
+  val stats: UserProfileStatsDto
+)

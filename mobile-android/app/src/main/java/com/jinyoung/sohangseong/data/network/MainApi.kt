@@ -4,6 +4,7 @@ import com.jinyoung.sohangseong.data.model.ApprovedItemDto
 import com.jinyoung.sohangseong.data.model.CommunityPostDto
 import com.jinyoung.sohangseong.data.model.CreateCommentRequest
 import com.jinyoung.sohangseong.data.model.CreatePostRequest
+import com.jinyoung.sohangseong.data.model.UserProfileSummaryDto
 import com.jinyoung.sohangseong.data.model.VoteRequest
 import com.jinyoung.sohangseong.data.model.VotePollDto
 import retrofit2.http.Body
@@ -20,6 +21,11 @@ interface MainApi {
 
   @GET("standards/approved-items")
   suspend fun getApprovedItems(): List<ApprovedItemDto>
+
+  @GET("users/{userId}/profile-summary")
+  suspend fun getProfileSummary(
+    @Path("userId") userId: String
+  ): UserProfileSummaryDto
 
   @POST("posts")
   suspend fun createPost(

@@ -6,6 +6,7 @@ import { authRoutes } from "./modules/auth/auth.route.js";
 import { healthRoutes } from "./modules/health/health.route.js";
 import { postRoutes } from "./modules/posts/posts.route.js";
 import { standardRoutes } from "./modules/standards/standards.route.js";
+import { userRoutes } from "./modules/users/users.route.js";
 
 export function buildApp() {
   const app = Fastify({ logger: true });
@@ -17,6 +18,7 @@ export function buildApp() {
   app.register(authRoutes, { prefix: "/api" });
   app.register(postRoutes, { prefix: "/api" });
   app.register(standardRoutes, { prefix: "/api" });
+  app.register(userRoutes, { prefix: "/api" });
 
   return app;
 }

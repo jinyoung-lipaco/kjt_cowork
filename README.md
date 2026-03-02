@@ -34,6 +34,7 @@ npm run dev
 - `GET /api/posts`
 - `POST /api/posts`
 - `POST /api/posts/comments`
+- `GET /api/users/:userId/profile-summary`
 - `GET /api/standards/polls`
 - `GET /api/standards/polls/:pollId`
 - `POST /api/standards/polls`
