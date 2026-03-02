@@ -7,12 +7,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.jinyoung.sohangseong.data.network.ApiClient
 import com.jinyoung.sohangseong.data.repository.AuthRepository
+import com.jinyoung.sohangseong.data.repository.MainRepository
 import com.jinyoung.sohangseong.data.store.TokenStore
 import com.jinyoung.sohangseong.ui.auth.LoginScreen
 import com.jinyoung.sohangseong.ui.auth.LoginViewModel
+import com.jinyoung.sohangseong.ui.main.MainTabsScreen
+import com.jinyoung.sohangseong.ui.main.MainTabsViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -29,8 +34,10 @@ class MainActivity : ComponentActivity() {
     enableEdgeToEdge()
 
     val tokenStore = TokenStore(applicationContext)
-    val authApi = ApiClient.create(tokenStore)
+    val authApi = ApiClient.createAuthApi(tokenStore)
+    val mainApi = ApiClient.createMainApi(tokenStore)
     val authRepository = AuthRepository(authApi, tokenStore)
+    val mainRepository = MainRepository(mainApi)
     val viewModel = LoginViewModel(authRepository)
 
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -58,25 +65,45 @@ class MainActivity : ComponentActivity() {
     setContent {
       val scope = rememberCoroutineScope()
       val loginState by viewModel.state.collectAsState()
+      val savedNickname by tokenStore.nicknameFlow.collectAsState(initial = null)
+      val mainTabsViewModel = remember { MainTabsViewModel(mainRepository) }
+      val mainTabsState by mainTabsViewModel.state.collectAsState()
 
-      LoginScreen(
-        state = loginState,
-        onEmailChanged = viewModel::onEmailChanged,
-        onPasswordChanged = viewModel::onPasswordChanged,
-        onLoginClick = { viewModel.signIn() },
-        onGoogleLoginClick = {
-          googleSignInClient.signOut()
-            .addOnCompleteListener {
-              googleSignInLauncher.launch(googleSignInClient.signInIntent)
+      if (savedNickname == null) {
+        LoginScreen(
+          state = loginState,
+          onEmailChanged = viewModel::onEmailChanged,
+          onPasswordChanged = viewModel::onPasswordChanged,
+          onLoginClick = { viewModel.signIn() },
+          onGoogleLoginClick = {
+            googleSignInClient.signOut()
+              .addOnCompleteListener {
+                googleSignInLauncher.launch(googleSignInClient.signInIntent)
+              }
+          },
+          onKakaoLoginClick = { startKakaoLogin(viewModel) },
+          onSignOutClick = {
+            scope.launch {
+              authRepository.signOut()
             }
-        },
-        onKakaoLoginClick = { startKakaoLogin(viewModel) },
-        onSignOutClick = {
-          scope.launch {
-            authRepository.signOut()
+          }
+        )
+      } else {
+        LaunchedEffect(savedNickname) {
+          mainTabsViewModel.refresh()
+        }
+        MainTabsScreen(
+          state = mainTabsState,
+          nickname = savedNickname ?: "",
+          onSelectTab = mainTabsViewModel::selectTab,
+          onRefresh = mainTabsViewModel::refresh,
+          onSignOut = {
+            scope.launch {
+              authRepository.signOut()
+            }
           }
         }
-      )
+      }
     }
   }
 

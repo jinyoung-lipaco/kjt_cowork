@@ -10,7 +10,15 @@ object ApiClient {
   // Android emulator local host mapping.
   const val BASE_URL = "http://10.0.2.2:4000/api/"
 
-  fun create(tokenStore: TokenStore): AuthApi {
+  fun createAuthApi(tokenStore: TokenStore): AuthApi {
+    return buildRetrofit(tokenStore).create(AuthApi::class.java)
+  }
+
+  fun createMainApi(tokenStore: TokenStore): MainApi {
+    return buildRetrofit(tokenStore).create(MainApi::class.java)
+  }
+
+  private fun buildRetrofit(tokenStore: TokenStore): Retrofit {
     val logging = HttpLoggingInterceptor().apply {
       level = HttpLoggingInterceptor.Level.BODY
     }
@@ -29,6 +37,5 @@ object ApiClient {
       .client(client)
       .addConverterFactory(GsonConverterFactory.create())
       .build()
-      .create(AuthApi::class.java)
   }
 }

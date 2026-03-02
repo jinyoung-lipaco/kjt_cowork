@@ -6,6 +6,7 @@
 - 카카오 로그인 SDK 연동 + 백엔드 연동 (`POST /api/auth/social/kakao`)
 - 구글 로그인 SDK 연동 + 백엔드 연동 (`POST /api/auth/social/google`)
 - 401 응답 시 토큰 재발급 자동 처리 (`POST /api/auth/refresh`)
+- 로그인 성공 후 메인 3탭 화면 구성 (커뮤니티/스탠다드/프로필)
 - Access/Refresh 토큰 로컬 저장 (`DataStore`)
 - 로그아웃(토큰 삭제) 동작 연결
 
@@ -42,6 +43,6 @@
    - `starmom@sohangseong.dev` / `test1234!`
 
 ## 다음 단계
-1. 인증 후 메인 탭(커뮤니티/스탠다드/프로필) 네비게이션 구성
+1. 메인 탭에서 생성/투표 액션 API 연결
 2. 소셜 로그인 실패 케이스(취소/권한 거부) UX 개선
 3. 재발급 실패 시 로그인 화면 복귀 UX 강화
