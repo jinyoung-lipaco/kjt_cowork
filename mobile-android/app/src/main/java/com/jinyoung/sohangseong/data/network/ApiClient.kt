@@ -1,5 +1,6 @@
 package com.jinyoung.sohangseong.data.network
 
+import com.jinyoung.sohangseong.BuildConfig
 import com.jinyoung.sohangseong.data.store.TokenStore
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -7,8 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-  // Android emulator local host mapping.
-  const val BASE_URL = "http://10.0.2.2:4000/api/"
+  val BASE_URL: String = BuildConfig.API_BASE_URL
 
   fun createAuthApi(tokenStore: TokenStore): AuthApi {
     return buildRetrofit(tokenStore).create(AuthApi::class.java)

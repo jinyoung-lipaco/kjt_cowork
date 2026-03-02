@@ -37,8 +37,9 @@
 - `app/src/main/java/com/jinyoung/sohangseong/data/store/TokenStore.kt`
 
 ## API 연결 기준
-- Base URL: `http://10.0.2.2:4000/api/`
-- 에뮬레이터에서 로컬 백엔드(`localhost:4000`) 접근용 주소입니다.
+- 기본 Base URL: `http://10.0.2.2:4000/api/` (에뮬레이터 로컬)
+- 친구 테스트용 APK 빌드 시 Base URL 오버라이드:
+  - `./gradlew :app:assembleRelease -PAPI_BASE_URL=http://<PC_IP_OR_DOMAIN>:4000/api/`
 
 ## 소셜 키 설정
 - 파일: `app/src/main/res/values/strings.xml`
@@ -54,6 +55,16 @@
 4. 시드 계정으로 로그인 테스트
    - `seedmom@sohangseong.dev` / `test1234!`
    - `starmom@sohangseong.dev` / `test1234!`
+
+## Docker 백엔드 + APK 빌드
+1. 서버 실행:
+   - `cd /Users/elbert.kim/Desktop/kjt_cowork`
+   - `docker compose up -d --build`
+2. 친구용 APK 빌드:
+   - `cd /Users/elbert.kim/Desktop/kjt_cowork/mobile-android`
+   - `./gradlew :app:assembleRelease -PAPI_BASE_URL=http://<PC_IP_OR_DOMAIN>:4000/api/`
+3. 산출물:
+   - `app/build/outputs/apk/release/app-release.apk`
 
 ## 다음 단계
 1. 스낵바 액션 패턴 삭제 플로우로 확장(게시글/댓글)

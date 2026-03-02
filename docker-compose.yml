@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: sohangseong-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: kjt_cowork
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d kjt_cowork"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sohangseong-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/kjt_cowork?schema=public
+      JWT_ACCESS_SECRET: local-docker-access-secret-min16
+      JWT_REFRESH_SECRET: local-docker-refresh-secret-min16
+      GOOGLE_CLIENT_ID: ""
+    ports:
+      - "4000:4000"
+
+volumes:
+  pg_data:

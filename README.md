@@ -22,6 +22,17 @@ npm run prisma:seed
 npm run dev
 ```
 
+## Docker 서버 실행(친구 테스트용)
+
+```bash
+cd /Users/elbert.kim/Desktop/kjt_cowork
+docker compose up -d --build
+```
+
+- API 확인: `http://<PC_IP_OR_DOMAIN>:4000/api/health`
+- 앱에서 사용할 API URL 예시: `http://<PC_IP_OR_DOMAIN>:4000/api/`
+- 외부 네트워크 테스트 시 공유기/방화벽에서 `4000` 포트 개방이 필요합니다.
+
 기본 헬스체크:
 - `GET http://localhost:4000/api/health`
 

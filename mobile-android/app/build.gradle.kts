@@ -3,9 +3,18 @@ plugins {
   id("org.jetbrains.kotlin.android")
 }
 
+val apiBaseUrl = ((findProperty("API_BASE_URL") as String?) ?: "http://10.0.2.2:4000/api/")
+  .let { if (it.endsWith("/")) it else "$it/" }
+
 android {
   namespace = "com.jinyoung.sohangseong"
   compileSdk = 35
+
+  signingConfigs {
+    // Temporary signing for direct install testing builds.
+    // Replace with a dedicated release keystore for store distribution.
+    getByName("debug")
+  }
 
   defaultConfig {
     applicationId = "com.jinyoung.sohangseong"
@@ -15,11 +24,13 @@ android {
     versionName = "0.1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
   }
 
   buildTypes {
     release {
       isMinifyEnabled = false
+      signingConfig = signingConfigs.getByName("debug")
       proguardFiles(
         getDefaultProguardFile("proguard-android-optimize.txt"),
         "proguard-rules.pro"
@@ -38,6 +49,7 @@ android {
 
   buildFeatures {
     compose = true
+    buildConfig = true
   }
 
   composeOptions {
