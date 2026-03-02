@@ -41,3 +41,14 @@ data class ApprovedItemDto(
   val safetyScore: Int,
   val priceText: String?
 )
+
+data class CreatePostRequest(
+  val title: String,
+  val body: String,
+  val authorId: String
+)
+
+data class VoteRequest(
+  val userId: String,
+  val optionId: String
+)

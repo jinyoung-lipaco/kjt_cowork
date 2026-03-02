@@ -65,11 +65,12 @@ class MainActivity : ComponentActivity() {
     setContent {
       val scope = rememberCoroutineScope()
       val loginState by viewModel.state.collectAsState()
+      val savedUserId by tokenStore.userIdFlow.collectAsState(initial = null)
       val savedNickname by tokenStore.nicknameFlow.collectAsState(initial = null)
       val mainTabsViewModel = remember { MainTabsViewModel(mainRepository) }
       val mainTabsState by mainTabsViewModel.state.collectAsState()
 
-      if (savedNickname == null) {
+      if (savedUserId == null || savedNickname == null) {
         LoginScreen(
           state = loginState,
           onEmailChanged = viewModel::onEmailChanged,
@@ -89,14 +90,21 @@ class MainActivity : ComponentActivity() {
           }
         )
       } else {
-        LaunchedEffect(savedNickname) {
+        LaunchedEffect(savedUserId, savedNickname) {
           mainTabsViewModel.refresh()
         }
         MainTabsScreen(
           state = mainTabsState,
+          userId = savedUserId ?: "",
           nickname = savedNickname ?: "",
           onSelectTab = mainTabsViewModel::selectTab,
           onRefresh = mainTabsViewModel::refresh,
+          onCreatePost = { title, body ->
+            mainTabsViewModel.createPost(savedUserId ?: "", title, body)
+          },
+          onVote = { pollId, optionId ->
+            mainTabsViewModel.vote(savedUserId ?: "", pollId, optionId)
+          },
           onSignOut = {
             scope.launch {
               authRepository.signOut()

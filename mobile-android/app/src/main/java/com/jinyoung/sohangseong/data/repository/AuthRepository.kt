@@ -47,6 +47,7 @@ class AuthRepository(
     tokenStore.saveAuth(
       accessToken = response.accessToken,
       refreshToken = response.refreshToken,
+      userId = response.user.id,
       nickname = response.user.nickname
     )
   }

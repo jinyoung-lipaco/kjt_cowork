@@ -18,7 +18,18 @@ private val Context.authDataStore by preferencesDataStore(name = "auth")
 class TokenStore(private val context: Context) {
   private val accessTokenKey = stringPreferencesKey("access_token")
   private val refreshTokenKey = stringPreferencesKey("refresh_token")
+  private val userIdKey = stringPreferencesKey("user_id")
   private val userNicknameKey = stringPreferencesKey("user_nickname")
+
+  val userIdFlow: Flow<String?> = context.authDataStore.data
+    .catch { exception ->
+      if (exception is IOException) {
+        emit(emptyPreferences())
+      } else {
+        throw exception
+      }
+    }
+    .map { prefs -> prefs[userIdKey] }
 
   val nicknameFlow: Flow<String?> = context.authDataStore.data
     .catch { exception ->
@@ -33,11 +44,13 @@ class TokenStore(private val context: Context) {
   suspend fun saveAuth(
     accessToken: String,
     refreshToken: String,
+    userId: String,
     nickname: String
   ) {
     context.authDataStore.edit { prefs: MutablePreferences ->
       prefs[accessTokenKey] = accessToken
       prefs[refreshTokenKey] = refreshToken
+      prefs[userIdKey] = userId
       prefs[userNicknameKey] = nickname
     }
   }
@@ -46,6 +59,7 @@ class TokenStore(private val context: Context) {
     context.authDataStore.edit { prefs ->
       prefs.remove(accessTokenKey)
       prefs.remove(refreshTokenKey)
+      prefs.remove(userIdKey)
       prefs.remove(userNicknameKey)
     }
   }

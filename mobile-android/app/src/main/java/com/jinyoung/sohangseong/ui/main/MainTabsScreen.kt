@@ -10,21 +10,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun MainTabsScreen(
   state: MainTabsUiState,
+  userId: String,
   nickname: String,
   onSelectTab: (MainTab) -> Unit,
   onRefresh: () -> Unit,
+  onCreatePost: (title: String, body: String) -> Unit,
+  onVote: (pollId: String, optionId: String) -> Unit,
   onSignOut: () -> Unit
 ) {
   Scaffold(
@@ -64,6 +72,12 @@ fun MainTabsScreen(
           color = MaterialTheme.colorScheme.error
         )
       }
+      if (state.actionMessage != null) {
+        Text(
+          text = state.actionMessage,
+          color = MaterialTheme.colorScheme.primary
+        )
+      }
 
       Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         Button(onClick = onRefresh) { Text("새로고침") }
@@ -71,17 +85,61 @@ fun MainTabsScreen(
       }
 
       when (state.selectedTab) {
-        MainTab.COMMUNITY -> CommunityTab(state = state)
-        MainTab.STANDARDS -> StandardsTab(state = state)
-        MainTab.PROFILE -> ProfileTab(nickname = nickname, state = state)
+        MainTab.COMMUNITY -> CommunityTab(
+          state = state,
+          onCreatePost = { title, body -> onCreatePost(title, body) }
+        )
+        MainTab.STANDARDS -> StandardsTab(
+          state = state,
+          onVote = onVote
+        )
+        MainTab.PROFILE -> ProfileTab(userId = userId, nickname = nickname, state = state)
       }
     }
   }
 }
 
 @Composable
-private fun CommunityTab(state: MainTabsUiState) {
+private fun CommunityTab(
+  state: MainTabsUiState,
+  onCreatePost: (title: String, body: String) -> Unit
+) {
+  var title by remember { mutableStateOf("") }
+  var body by remember { mutableStateOf("") }
+
   LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    item {
+      Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          Text("새 글 작성", style = MaterialTheme.typography.titleMedium)
+          OutlinedTextField(
+            value = title,
+            onValueChange = { title = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("제목") },
+            singleLine = true
+          )
+          OutlinedTextField(
+            value = body,
+            onValueChange = { body = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("내용") }
+          )
+          Button(
+            onClick = {
+              onCreatePost(title, body)
+              title = ""
+              body = ""
+            },
+            enabled = !state.loading,
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text("등록")
+          }
+        }
+      }
+    }
+
     items(state.posts) { post ->
       Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -98,7 +156,10 @@ private fun CommunityTab(state: MainTabsUiState) {
 }
 
 @Composable
-private fun StandardsTab(state: MainTabsUiState) {
+private fun StandardsTab(
+  state: MainTabsUiState,
+  onVote: (pollId: String, optionId: String) -> Unit
+) {
   LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     item {
       Text("진행 중 투표", style = MaterialTheme.typography.titleMedium)
@@ -113,6 +174,20 @@ private fun StandardsTab(state: MainTabsUiState) {
           )
           if (!poll.description.isNullOrBlank()) {
             Text(text = poll.description, style = MaterialTheme.typography.bodyMedium)
+          }
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+          ) {
+            poll.options.forEach { option ->
+              Button(
+                onClick = { onVote(poll.id, option.id) },
+                enabled = !state.loading,
+                modifier = Modifier.weight(1f)
+              ) {
+                Text(option.label)
+              }
+            }
           }
         }
       }
@@ -140,10 +215,11 @@ private fun StandardsTab(state: MainTabsUiState) {
 }
 
 @Composable
-private fun ProfileTab(nickname: String, state: MainTabsUiState) {
+private fun ProfileTab(userId: String, nickname: String, state: MainTabsUiState) {
   Card(modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Text("프로필", style = MaterialTheme.typography.titleMedium)
+      Text("사용자 ID: $userId")
       Text("닉네임: $nickname")
       Text("커뮤니티 글: ${state.posts.size}개")
       Text("진행/종료 투표: ${state.polls.size}개")
