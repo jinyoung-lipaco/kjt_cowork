@@ -8,6 +8,7 @@ import com.jinyoung.sohangseong.data.model.UserProfileSummaryDto
 import com.jinyoung.sohangseong.data.model.VotePollDetailDto
 import com.jinyoung.sohangseong.data.model.VotePollDto
 import com.jinyoung.sohangseong.data.repository.MainRepository
+import java.io.IOException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +24,7 @@ data class MainTabsUiState(
   val selectedPostId: String? = null,
   val selectedPollId: String? = null,
   val selectedApprovedItemId: String? = null,
+  val isOffline: Boolean = false,
   val loading: Boolean = false,
   val errorMessage: String? = null,
   val actionMessage: String? = null,
@@ -87,7 +89,7 @@ class MainTabsViewModel(
 
   fun refresh(userId: String) {
     viewModelScope.launch {
-      _state.update { it.copy(loading = true, errorMessage = null) }
+      _state.update { it.copy(loading = true, errorMessage = null, isOffline = false) }
 
       val postsResult = repository.getPosts()
       val pollsResult = repository.getPolls()
@@ -102,7 +104,8 @@ class MainTabsViewModel(
       _state.update {
         it.copy(
           loading = false,
-          errorMessage = error?.message,
+          errorMessage = toUiErrorMessage(error, "데이터를 불러오지 못했습니다."),
+          isOffline = isOfflineError(error),
           posts = postsResult.getOrDefault(emptyList()),
           polls = pollsResult.getOrDefault(emptyList()),
           approvedItems = itemsResult.getOrDefault(emptyList()),
@@ -119,7 +122,7 @@ class MainTabsViewModel(
     }
 
     viewModelScope.launch {
-      _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null) }
+      _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null, isOffline = false) }
       repository.createPost(userId, title, body)
         .onSuccess {
           _state.update { it.copy(actionMessage = "글이 등록되었습니다.") }
@@ -129,7 +132,8 @@ class MainTabsViewModel(
           _state.update {
             it.copy(
               loading = false,
-              errorMessage = "글 등록 실패: ${error.message ?: "알 수 없는 오류"}"
+              errorMessage = "글 등록 실패: ${toUiErrorMessage(error, "알 수 없는 오류")}",
+              isOffline = isOfflineError(error)
             )
           }
         }
@@ -138,7 +142,7 @@ class MainTabsViewModel(
 
   fun vote(userId: String, pollId: String, optionId: String) {
     viewModelScope.launch {
-      _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null) }
+      _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null, isOffline = false) }
       repository.votePoll(userId, pollId, optionId)
         .onSuccess {
           _state.update { it.copy(actionMessage = "투표가 반영되었습니다.") }
@@ -149,7 +153,8 @@ class MainTabsViewModel(
           _state.update {
             it.copy(
               loading = false,
-              errorMessage = "투표 실패: ${error.message ?: "알 수 없는 오류"}"
+              errorMessage = "투표 실패: ${toUiErrorMessage(error, "알 수 없는 오류")}",
+              isOffline = isOfflineError(error)
             )
           }
         }
@@ -163,7 +168,7 @@ class MainTabsViewModel(
     }
 
     viewModelScope.launch {
-      _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null) }
+      _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null, isOffline = false) }
       repository.createComment(userId = userId, postId = postId, body = body)
         .onSuccess {
           _state.update { it.copy(actionMessage = "댓글이 등록되었습니다.") }
@@ -173,7 +178,8 @@ class MainTabsViewModel(
           _state.update {
             it.copy(
               loading = false,
-              errorMessage = "댓글 등록 실패: ${error.message ?: "알 수 없는 오류"}"
+              errorMessage = "댓글 등록 실패: ${toUiErrorMessage(error, "알 수 없는 오류")}",
+              isOffline = isOfflineError(error)
             )
           }
         }
@@ -184,11 +190,33 @@ class MainTabsViewModel(
     viewModelScope.launch {
       repository.getPollDetail(pollId)
         .onSuccess { detail ->
-          _state.update { it.copy(selectedPollDetail = detail, errorMessage = null) }
+          _state.update { it.copy(selectedPollDetail = detail, errorMessage = null, isOffline = false) }
         }
         .onFailure { error ->
-          _state.update { it.copy(errorMessage = "투표 상세 조회 실패: ${error.message ?: "알 수 없는 오류"}") }
+          _state.update {
+            it.copy(
+              errorMessage = "투표 상세 조회 실패: ${toUiErrorMessage(error, "알 수 없는 오류")}",
+              isOffline = isOfflineError(error)
+            )
+          }
         }
+    }
+  }
+
+  private fun isOfflineError(error: Throwable?): Boolean {
+    var current = error
+    while (current != null) {
+      if (current is IOException) return true
+      current = current.cause
+    }
+    return false
+  }
+
+  private fun toUiErrorMessage(error: Throwable?, fallback: String): String {
+    return if (isOfflineError(error)) {
+      "오프라인 상태입니다. 네트워크 연결 후 다시 시도해 주세요."
+    } else {
+      error?.message ?: fallback
     }
   }
 }

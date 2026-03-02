@@ -78,15 +78,34 @@ fun MainTabsScreen(
       verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
       if (state.errorMessage != null) {
-        Text(
-          text = "데이터 로드 실패: ${state.errorMessage}",
-          color = MaterialTheme.colorScheme.error
-        )
+        Card(modifier = Modifier.fillMaxWidth()) {
+          Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+              text = "오류: ${state.errorMessage}",
+              color = MaterialTheme.colorScheme.error,
+              style = MaterialTheme.typography.bodySmall
+            )
+            Button(
+              onClick = onRefresh,
+              enabled = !state.loading,
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Text(if (state.loading) "재시도 중..." else "다시 시도")
+            }
+          }
+        }
       }
       if (state.actionMessage != null) {
         Text(
           text = state.actionMessage,
           color = MaterialTheme.colorScheme.primary
+        )
+      }
+      if (state.isOffline) {
+        Text(
+          text = "오프라인 모드: 네트워크 복구 후 다시 시도해 주세요.",
+          color = MaterialTheme.colorScheme.error,
+          style = MaterialTheme.typography.bodySmall
         )
       }
       if (state.loading) {
