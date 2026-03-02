@@ -32,6 +32,11 @@ fun MainTabsScreen(
   userId: String,
   nickname: String,
   onSelectTab: (MainTab) -> Unit,
+  onOpenPostDetail: (String) -> Unit,
+  onClosePostDetail: () -> Unit,
+  onOpenPollDetail: (String) -> Unit,
+  onOpenApprovedItemDetail: (String) -> Unit,
+  onCloseStandardsDetail: () -> Unit,
   onRefresh: () -> Unit,
   onCreatePost: (title: String, body: String) -> Unit,
   onCreateComment: (postId: String, body: String) -> Unit,
@@ -97,11 +102,16 @@ fun MainTabsScreen(
         MainTab.COMMUNITY -> CommunityTab(
           state = state,
           onCreatePost = { title, body -> onCreatePost(title, body) },
-          onCreateComment = onCreateComment
+          onCreateComment = onCreateComment,
+          onOpenPostDetail = onOpenPostDetail,
+          onClosePostDetail = onClosePostDetail
         )
         MainTab.STANDARDS -> StandardsTab(
           state = state,
-          onVote = onVote
+          onVote = onVote,
+          onOpenPollDetail = onOpenPollDetail,
+          onOpenApprovedItemDetail = onOpenApprovedItemDetail,
+          onCloseDetail = onCloseStandardsDetail
         )
         MainTab.PROFILE -> ProfileTab(userId = userId, nickname = nickname, state = state)
       }
@@ -113,11 +123,26 @@ fun MainTabsScreen(
 private fun CommunityTab(
   state: MainTabsUiState,
   onCreatePost: (title: String, body: String) -> Unit,
-  onCreateComment: (postId: String, body: String) -> Unit
+  onCreateComment: (postId: String, body: String) -> Unit,
+  onOpenPostDetail: (String) -> Unit,
+  onClosePostDetail: () -> Unit
 ) {
   var title by remember { mutableStateOf("") }
   var body by remember { mutableStateOf("") }
   val commentInputs = remember { mutableStateMapOf<String, String>() }
+  val selectedPost = state.posts.firstOrNull { it.id == state.selectedPostId }
+
+  if (selectedPost != null) {
+    CommunityPostDetail(
+      state = state,
+      post = selectedPost,
+      commentInput = commentInputs[selectedPost.id] ?: "",
+      onCommentInputChanged = { commentInputs[selectedPost.id] = it },
+      onCreateComment = { onCreateComment(selectedPost.id, commentInputs[selectedPost.id] ?: "") },
+      onBack = onClosePostDetail
+    )
+    return
+  }
 
   LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     item {
@@ -177,6 +202,13 @@ private fun CommunityTab(
               )
             }
           }
+          Button(
+            onClick = { onOpenPostDetail(post.id) },
+            enabled = !state.loading,
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text("상세 보기")
+          }
           OutlinedTextField(
             value = commentInputs[post.id] ?: "",
             onValueChange = { commentInputs[post.id] = it },
@@ -202,8 +234,29 @@ private fun CommunityTab(
 @Composable
 private fun StandardsTab(
   state: MainTabsUiState,
-  onVote: (pollId: String, optionId: String) -> Unit
+  onVote: (pollId: String, optionId: String) -> Unit,
+  onOpenPollDetail: (String) -> Unit,
+  onOpenApprovedItemDetail: (String) -> Unit,
+  onCloseDetail: () -> Unit
 ) {
+  val selectedPoll = state.polls.firstOrNull { it.id == state.selectedPollId }
+  val selectedItem = state.approvedItems.firstOrNull { it.id == state.selectedApprovedItemId }
+
+  if (selectedPoll != null) {
+    PollDetail(
+      poll = selectedPoll,
+      loading = state.loading,
+      onVote = { optionId -> onVote(selectedPoll.id, optionId) },
+      onBack = onCloseDetail
+    )
+    return
+  }
+
+  if (selectedItem != null) {
+    ApprovedItemDetail(item = selectedItem, onBack = onCloseDetail)
+    return
+  }
+
   LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     item {
       Text("진행 중 투표", style = MaterialTheme.typography.titleMedium)
@@ -238,6 +291,13 @@ private fun StandardsTab(
               }
             }
           }
+          Button(
+            onClick = { onOpenPollDetail(poll.id) },
+            enabled = !state.loading,
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text("투표 상세")
+          }
         }
       }
     }
@@ -262,6 +322,13 @@ private fun StandardsTab(
             text = "${item.brand ?: "브랜드 미표기"} · ${item.priceText ?: "가격 정보 없음"}",
             style = MaterialTheme.typography.bodySmall
           )
+          Button(
+            onClick = { onOpenApprovedItemDetail(item.id) },
+            enabled = !state.loading,
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text("인정템 상세")
+          }
         }
       }
     }
@@ -344,5 +411,100 @@ private fun EmptyStateCard(message: String) {
       modifier = Modifier.padding(12.dp),
       style = MaterialTheme.typography.bodySmall
     )
+  }
+}
+
+@Composable
+private fun CommunityPostDetail(
+  state: MainTabsUiState,
+  post: com.jinyoung.sohangseong.data.model.CommunityPostDto,
+  commentInput: String,
+  onCommentInputChanged: (String) -> Unit,
+  onCreateComment: () -> Unit,
+  onBack: () -> Unit
+) {
+  Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Button(onClick = onBack) { Text("목록으로") }
+    Card(modifier = Modifier.fillMaxWidth()) {
+      Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(post.title, style = MaterialTheme.typography.titleMedium)
+        Text(post.body, style = MaterialTheme.typography.bodyMedium)
+        Text("작성자 ${post.author.nickname}", style = MaterialTheme.typography.bodySmall)
+        Text("댓글 ${post.comments.size}개", style = MaterialTheme.typography.bodySmall)
+      }
+    }
+    Card(modifier = Modifier.fillMaxWidth()) {
+      Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (post.comments.isEmpty()) {
+          Text("- 아직 댓글이 없습니다.", style = MaterialTheme.typography.bodySmall)
+        } else {
+          post.comments.forEach { comment ->
+            Text("• ${comment.body}", style = MaterialTheme.typography.bodySmall)
+          }
+        }
+        OutlinedTextField(
+          value = commentInput,
+          onValueChange = onCommentInputChanged,
+          modifier = Modifier.fillMaxWidth(),
+          label = { Text("댓글 작성") }
+        )
+        Button(
+          onClick = onCreateComment,
+          enabled = !state.loading,
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Text("댓글 등록")
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun PollDetail(
+  poll: com.jinyoung.sohangseong.data.model.VotePollDto,
+  loading: Boolean,
+  onVote: (String) -> Unit,
+  onBack: () -> Unit
+) {
+  Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Button(onClick = onBack) { Text("목록으로") }
+    Card(modifier = Modifier.fillMaxWidth()) {
+      Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(poll.title, style = MaterialTheme.typography.titleMedium)
+        if (!poll.description.isNullOrBlank()) {
+          Text(poll.description, style = MaterialTheme.typography.bodyMedium)
+        }
+        Text("상태 ${poll.status} · 참여 ${poll.participantCount}명", style = MaterialTheme.typography.bodySmall)
+        poll.options.forEach { option ->
+          Button(
+            onClick = { onVote(option.id) },
+            enabled = !loading,
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text(option.label)
+          }
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun ApprovedItemDetail(
+  item: com.jinyoung.sohangseong.data.model.ApprovedItemDto,
+  onBack: () -> Unit
+) {
+  Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Button(onClick = onBack) { Text("목록으로") }
+    Card(modifier = Modifier.fillMaxWidth()) {
+      Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(item.name, style = MaterialTheme.typography.titleMedium)
+        Text("카테고리: ${item.category}")
+        Text("브랜드: ${item.brand ?: "브랜드 미표기"}")
+        Text("안전 점수: ${item.safetyScore}")
+        Text("가격: ${item.priceText ?: "가격 정보 없음"}")
+      }
+    }
   }
 }

@@ -19,6 +19,9 @@ enum class MainTab {
 
 data class MainTabsUiState(
   val selectedTab: MainTab = MainTab.COMMUNITY,
+  val selectedPostId: String? = null,
+  val selectedPollId: String? = null,
+  val selectedApprovedItemId: String? = null,
   val loading: Boolean = false,
   val errorMessage: String? = null,
   val actionMessage: String? = null,
@@ -35,7 +38,46 @@ class MainTabsViewModel(
   val state: StateFlow<MainTabsUiState> = _state.asStateFlow()
 
   fun selectTab(tab: MainTab) {
-    _state.update { it.copy(selectedTab = tab) }
+    _state.update {
+      it.copy(
+        selectedTab = tab,
+        selectedPostId = null,
+        selectedPollId = null,
+        selectedApprovedItemId = null
+      )
+    }
+  }
+
+  fun openPostDetail(postId: String) {
+    _state.update { it.copy(selectedTab = MainTab.COMMUNITY, selectedPostId = postId) }
+  }
+
+  fun closePostDetail() {
+    _state.update { it.copy(selectedPostId = null) }
+  }
+
+  fun openPollDetail(pollId: String) {
+    _state.update {
+      it.copy(
+        selectedTab = MainTab.STANDARDS,
+        selectedPollId = pollId,
+        selectedApprovedItemId = null
+      )
+    }
+  }
+
+  fun openApprovedItemDetail(itemId: String) {
+    _state.update {
+      it.copy(
+        selectedTab = MainTab.STANDARDS,
+        selectedApprovedItemId = itemId,
+        selectedPollId = null
+      )
+    }
+  }
+
+  fun closeStandardsDetail() {
+    _state.update { it.copy(selectedPollId = null, selectedApprovedItemId = null) }
   }
 
   fun refresh(userId: String) {

@@ -125,6 +125,11 @@ class MainActivity : ComponentActivity() {
           userId = savedUserId ?: "",
           nickname = savedNickname ?: "",
           onSelectTab = mainTabsViewModel::selectTab,
+          onOpenPostDetail = mainTabsViewModel::openPostDetail,
+          onClosePostDetail = mainTabsViewModel::closePostDetail,
+          onOpenPollDetail = mainTabsViewModel::openPollDetail,
+          onOpenApprovedItemDetail = mainTabsViewModel::openApprovedItemDetail,
+          onCloseStandardsDetail = mainTabsViewModel::closeStandardsDetail,
           onRefresh = { mainTabsViewModel.refresh(savedUserId ?: "") },
           onCreatePost = { title, body ->
             mainTabsViewModel.createPost(savedUserId ?: "", title, body)
