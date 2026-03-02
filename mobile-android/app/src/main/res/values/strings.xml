@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">소행성</string>
+    <string name="google_web_client_id">replace-with-google-web-client-id</string>
+    <string name="kakao_native_app_key">replace-with-kakao-native-app-key</string>
+</resources>

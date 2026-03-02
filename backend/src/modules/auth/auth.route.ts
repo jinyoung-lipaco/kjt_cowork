@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
+import jwt from "jsonwebtoken";
 import type { FastifyInstance, FastifyReply } from "fastify";
 import { AuthProvider } from "@prisma/client";
 import { z } from "zod";
@@ -17,6 +18,10 @@ const signInSchema = z.object({
   password: z.string().min(8)
 });
 
+const refreshSchema = z.object({
+  refreshToken: z.string().min(1)
+});
+
 const googleSocialSchema = z.object({
   idToken: z.string().min(1),
   nickname: z.string().min(2).max(24).optional()
@@ -30,9 +35,12 @@ const kakaoSocialSchema = z.object({
 const googleClient = env.GOOGLE_CLIENT_ID ? new OAuth2Client(env.GOOGLE_CLIENT_ID) : null;
 
 function buildTokens(reply: FastifyReply, userId: string) {
+  const refreshToken = jwt.sign({ sub: userId, type: "refresh" }, env.JWT_REFRESH_SECRET, {
+    expiresIn: "30d"
+  });
   return Promise.all([
     reply.jwtSign({ sub: userId, type: "access" }, { expiresIn: "15m" }),
-    reply.jwtSign({ sub: userId, type: "refresh" }, { expiresIn: "30d" })
+    Promise.resolve(refreshToken)
   ]);
 }
 
@@ -124,6 +132,36 @@ export async function authRoutes(app: FastifyInstance) {
 
     const [accessToken, refreshToken] = await buildTokens(reply, user.id);
 
+    return {
+      user: { id: user.id, email: user.email, nickname: user.nickname, tier: user.tier },
+      accessToken,
+      refreshToken
+    };
+  });
+
+  app.post("/auth/refresh", async (request, reply) => {
+    const body = refreshSchema.parse(request.body);
+
+    let payload: { sub?: string; type?: string };
+    try {
+      payload = jwt.verify(body.refreshToken, env.JWT_REFRESH_SECRET) as {
+        sub?: string;
+        type?: string;
+      };
+    } catch {
+      return reply.code(401).send({ message: "유효하지 않은 리프레시 토큰입니다." });
+    }
+
+    if (payload.type !== "refresh" || !payload.sub) {
+      return reply.code(401).send({ message: "유효하지 않은 리프레시 토큰입니다." });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+    if (!user) {
+      return reply.code(401).send({ message: "사용자를 찾을 수 없습니다." });
+    }
+
+    const [accessToken, refreshToken] = await buildTokens(reply, user.id);
     return {
       user: { id: user.id, email: user.email, nickname: user.nickname, tier: user.tier },
       accessToken,

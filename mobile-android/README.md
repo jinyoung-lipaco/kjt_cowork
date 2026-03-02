@@ -1,26 +1,47 @@
-# Android 앱 개발 계획
+# Android 앱 (초기 구현)
+
+## 현재 구현 상태
+- Jetpack Compose 기반 앱 셸 생성
+- 이메일 로그인 API 연동 (`POST /api/auth/sign-in`)
+- 카카오 로그인 SDK 연동 + 백엔드 연동 (`POST /api/auth/social/kakao`)
+- 구글 로그인 SDK 연동 + 백엔드 연동 (`POST /api/auth/social/google`)
+- 401 응답 시 토큰 재발급 자동 처리 (`POST /api/auth/refresh`)
+- Access/Refresh 토큰 로컬 저장 (`DataStore`)
+- 로그아웃(토큰 삭제) 동작 연결
 
 ## 기본값
 - 앱명: 소행성
-- 패키지명: com.jinyoung.sohangseong
+- 패키지명: `com.jinyoung.sohangseong`
 - 최소 SDK: 26
-- 타깃 SDK: 최신 안정 버전
+- 타깃 SDK: 35
 
-## 권장 스택
-- Kotlin
-- Jetpack Compose
-- Hilt
-- Retrofit + OkHttp
-- Room (오프라인 캐시)
-- Firebase Messaging
+## 주요 파일
+- `app/src/main/java/com/jinyoung/sohangseong/MainActivity.kt`
+- `app/src/main/java/com/jinyoung/sohangseong/ui/auth/LoginScreen.kt`
+- `app/src/main/java/com/jinyoung/sohangseong/ui/auth/LoginViewModel.kt`
+- `app/src/main/java/com/jinyoung/sohangseong/data/network/*`
+- `app/src/main/java/com/jinyoung/sohangseong/data/store/TokenStore.kt`
 
-## 개발 순서
-1. 앱 셸(네비게이션/테마) 구축
-2. 인증(이메일/카카오/구글) 연결
-3. 커뮤니티/스탠다드/프로필 화면 연동
-4. 푸시/딥링크/에러 로깅 적용
-5. QA 및 Play 배포
+## API 연결 기준
+- Base URL: `http://10.0.2.2:4000/api/`
+- 에뮬레이터에서 로컬 백엔드(`localhost:4000`) 접근용 주소입니다.
 
-## 참고
-- 현재 저장소의 `prototype.html`은 UI/기획 기준서 역할로 유지
-- 실서비스 앱은 네이티브로 재구현
+## 소셜 키 설정
+- 파일: `app/src/main/res/values/strings.xml`
+- 아래 값을 실제 키로 교체
+  - `google_web_client_id`
+  - `kakao_native_app_key`
+- 백엔드(`backend/.env`)에도 `GOOGLE_CLIENT_ID`를 같은 구글 웹 클라이언트 ID로 맞춰야 합니다.
+
+## 실행 순서
+1. `backend` 서버 실행 (`npm run dev`)
+2. Android Studio에서 `mobile-android` 열기
+3. Gradle Sync 후 에뮬레이터 실행
+4. 시드 계정으로 로그인 테스트
+   - `seedmom@sohangseong.dev` / `test1234!`
+   - `starmom@sohangseong.dev` / `test1234!`
+
+## 다음 단계
+1. 인증 후 메인 탭(커뮤니티/스탠다드/프로필) 네비게이션 구성
+2. 소셜 로그인 실패 케이스(취소/권한 거부) UX 개선
+3. 재발급 실패 시 로그인 화면 복귀 UX 강화
