@@ -231,7 +231,7 @@ class MainTabsViewModel(
           _state.update {
             it.copy(
               loading = false,
-              errorMessage = "프로필 수정 실패: ${toUiErrorMessage(error, "알 수 없는 오류")}",
+              errorMessage = toProfileNicknameErrorMessage(error),
               isOffline = isOfflineError(error)
             )
           }
@@ -312,6 +312,19 @@ class MainTabsViewModel(
       "오프라인 상태입니다. 네트워크 연결 후 다시 시도해 주세요."
     } else {
       error?.message ?: fallback
+    }
+  }
+
+  private fun toProfileNicknameErrorMessage(error: Throwable?): String {
+    val message = toUiErrorMessage(error, "닉네임 변경에 실패했습니다.")
+    return when {
+      message.contains("이미 사용 중인 닉네임") ->
+        "이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해 주세요."
+      message.contains("사용할 수 없는 닉네임") ->
+        "금칙어가 포함된 닉네임은 사용할 수 없습니다."
+      message.contains("2~20자") || message.contains("2자") || message.contains("20자") ->
+        "닉네임은 2~20자로 입력해 주세요."
+      else -> message
     }
   }
 }

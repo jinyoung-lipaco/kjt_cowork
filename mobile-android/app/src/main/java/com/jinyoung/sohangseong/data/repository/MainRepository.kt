@@ -13,6 +13,8 @@ import com.jinyoung.sohangseong.data.model.VotePollDetailDto
 import com.jinyoung.sohangseong.data.model.VoteRequest
 import com.jinyoung.sohangseong.data.model.VotePollDto
 import com.jinyoung.sohangseong.data.network.MainApi
+import org.json.JSONObject
+import retrofit2.HttpException
 
 class MainRepository(
   private val mainApi: MainApi
@@ -42,6 +44,8 @@ class MainRepository(
   suspend fun updateProfileNickname(userId: String, nickname: String): Result<UpdateProfileResponseDto> {
     return runCatching {
       mainApi.updateProfile(userId = userId, body = UpdateProfileRequest(nickname = nickname.trim()))
+    }.recoverCatching { error ->
+      throw mapApiException(error, "닉네임 변경에 실패했습니다.")
     }
   }
 
@@ -78,5 +82,22 @@ class MainRepository(
       )
       Unit
     }
+  }
+
+  private fun mapApiException(error: Throwable, fallback: String): Exception {
+    val serverMessage = (error as? HttpException)
+      ?.response()
+      ?.errorBody()
+      ?.string()
+      ?.let(::extractErrorMessageField)
+
+    val message = if (serverMessage.isNullOrBlank()) error.message ?: fallback else serverMessage
+    return Exception(message, error)
+  }
+
+  private fun extractErrorMessageField(raw: String): String? {
+    return runCatching {
+      JSONObject(raw).optString("message").takeIf { it.isNotBlank() }
+    }.getOrNull()
   }
 }
