@@ -86,8 +86,16 @@ class MainActivity : ComponentActivity() {
       val loginState by viewModel.state.collectAsState()
       val savedUserId by tokenStore.userIdFlow.collectAsState(initial = null)
       val savedNickname by tokenStore.nicknameFlow.collectAsState(initial = null)
+      val sessionExpiredMessage by tokenStore.sessionExpiredMessageFlow.collectAsState(initial = null)
       val mainTabsViewModel = remember { MainTabsViewModel(mainRepository) }
       val mainTabsState by mainTabsViewModel.state.collectAsState()
+
+      LaunchedEffect(savedUserId, savedNickname, sessionExpiredMessage) {
+        if (savedUserId == null && savedNickname == null && !sessionExpiredMessage.isNullOrBlank()) {
+          viewModel.setInfo(sessionExpiredMessage ?: "")
+          tokenStore.clearSessionExpiredMessage()
+        }
+      }
 
       if (savedUserId == null || savedNickname == null) {
         LoginScreen(

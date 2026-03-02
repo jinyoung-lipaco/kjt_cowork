@@ -24,16 +24,22 @@ class TokenRefreshAuthenticator(
 
   override fun authenticate(route: Route?, response: Response): Request? {
     if (response.request.url.encodedPath.endsWith("/auth/refresh")) return null
-    if (responseCount(response) >= 2) return null
+    if (responseCount(response) >= 2) {
+      runBlocking { tokenStore.expireSession("인증이 만료되어 로그아웃되었습니다. 다시 로그인해 주세요.") }
+      return null
+    }
 
-    val refreshToken = runBlocking { tokenStore.getRefreshToken() } ?: return null
+    val refreshToken = runBlocking { tokenStore.getRefreshToken() } ?: run {
+      runBlocking { tokenStore.expireSession("세션 정보가 없어 로그아웃되었습니다. 다시 로그인해 주세요.") }
+      return null
+    }
 
     val refreshed = runBlocking {
       runCatching {
         refreshApi.refresh(RefreshTokenRequest(refreshToken))
       }.getOrNull()
     } ?: run {
-      runBlocking { tokenStore.clear() }
+      runBlocking { tokenStore.expireSession("세션이 만료되어 로그아웃되었습니다. 다시 로그인해 주세요.") }
       return null
     }
 

@@ -20,6 +20,7 @@ class TokenStore(private val context: Context) {
   private val refreshTokenKey = stringPreferencesKey("refresh_token")
   private val userIdKey = stringPreferencesKey("user_id")
   private val userNicknameKey = stringPreferencesKey("user_nickname")
+  private val sessionExpiredMessageKey = stringPreferencesKey("session_expired_message")
 
   val userIdFlow: Flow<String?> = context.authDataStore.data
     .catch { exception ->
@@ -41,6 +42,16 @@ class TokenStore(private val context: Context) {
     }
     .map { prefs -> prefs[userNicknameKey] }
 
+  val sessionExpiredMessageFlow: Flow<String?> = context.authDataStore.data
+    .catch { exception ->
+      if (exception is IOException) {
+        emit(emptyPreferences())
+      } else {
+        throw exception
+      }
+    }
+    .map { prefs -> prefs[sessionExpiredMessageKey] }
+
   suspend fun saveAuth(
     accessToken: String,
     refreshToken: String,
@@ -61,6 +72,23 @@ class TokenStore(private val context: Context) {
       prefs.remove(refreshTokenKey)
       prefs.remove(userIdKey)
       prefs.remove(userNicknameKey)
+      prefs.remove(sessionExpiredMessageKey)
+    }
+  }
+
+  suspend fun expireSession(message: String) {
+    context.authDataStore.edit { prefs ->
+      prefs.remove(accessTokenKey)
+      prefs.remove(refreshTokenKey)
+      prefs.remove(userIdKey)
+      prefs.remove(userNicknameKey)
+      prefs[sessionExpiredMessageKey] = message
+    }
+  }
+
+  suspend fun clearSessionExpiredMessage() {
+    context.authDataStore.edit { prefs ->
+      prefs.remove(sessionExpiredMessageKey)
     }
   }
 
