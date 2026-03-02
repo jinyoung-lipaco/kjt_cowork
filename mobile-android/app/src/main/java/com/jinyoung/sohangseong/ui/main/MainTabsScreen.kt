@@ -1,10 +1,13 @@
 package com.jinyoung.sohangseong.ui.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -239,7 +242,7 @@ private fun StandardsTab(
   onOpenApprovedItemDetail: (String) -> Unit,
   onCloseDetail: () -> Unit
 ) {
-  val selectedPoll = state.polls.firstOrNull { it.id == state.selectedPollId }
+  val selectedPoll = state.selectedPollDetail
   val selectedItem = state.approvedItems.firstOrNull { it.id == state.selectedApprovedItemId }
 
   if (selectedPoll != null) {
@@ -462,7 +465,7 @@ private fun CommunityPostDetail(
 
 @Composable
 private fun PollDetail(
-  poll: com.jinyoung.sohangseong.data.model.VotePollDto,
+  poll: com.jinyoung.sohangseong.data.model.VotePollDetailDto,
   loading: Boolean,
   onVote: (String) -> Unit,
   onBack: () -> Unit
@@ -475,14 +478,35 @@ private fun PollDetail(
         if (!poll.description.isNullOrBlank()) {
           Text(poll.description, style = MaterialTheme.typography.bodyMedium)
         }
-        Text("상태 ${poll.status} · 참여 ${poll.participantCount}명", style = MaterialTheme.typography.bodySmall)
+        Text("상태 ${poll.status} · 참여 ${poll.totalVotes}명", style = MaterialTheme.typography.bodySmall)
         poll.options.forEach { option ->
+          val ratio = if (poll.totalVotes > 0) option.voteCount.toFloat() / poll.totalVotes.toFloat() else 0f
+          val percentText = if (poll.totalVotes > 0) "${(ratio * 100).toInt()}%" else "0%"
+          Text(
+            text = "${option.label} · ${option.voteCount}표 ($percentText)",
+            style = MaterialTheme.typography.bodySmall
+          )
+          Box(
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(10.dp)
+              .background(MaterialTheme.colorScheme.surfaceVariant)
+          ) {
+            Box(
+              modifier = Modifier
+                .fillMaxWidth(ratio.coerceIn(0f, 1f))
+                .height(10.dp)
+                .background(MaterialTheme.colorScheme.primary)
+            )
+          }
           Button(
             onClick = { onVote(option.id) },
             enabled = !loading,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(bottom = 4.dp)
           ) {
-            Text(option.label)
+            Text("${option.label} 선택")
           }
         }
       }

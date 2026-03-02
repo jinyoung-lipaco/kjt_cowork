@@ -24,6 +24,13 @@ data class VoteOptionDto(
   val sortOrder: Int
 )
 
+data class VoteDetailOptionDto(
+  val id: String,
+  val label: String,
+  val sortOrder: Int,
+  val voteCount: Int
+)
+
 data class VotePollDto(
   val id: String,
   val title: String,
@@ -31,6 +38,15 @@ data class VotePollDto(
   val status: String,
   val options: List<VoteOptionDto>,
   val participantCount: Int
+)
+
+data class VotePollDetailDto(
+  val id: String,
+  val title: String,
+  val description: String?,
+  val status: String,
+  val totalVotes: Int,
+  val options: List<VoteDetailOptionDto>
 )
 
 data class ApprovedItemDto(

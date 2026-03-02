@@ -5,6 +5,7 @@ import com.jinyoung.sohangseong.data.model.CommunityPostDto
 import com.jinyoung.sohangseong.data.model.CreateCommentRequest
 import com.jinyoung.sohangseong.data.model.CreatePostRequest
 import com.jinyoung.sohangseong.data.model.UserProfileSummaryDto
+import com.jinyoung.sohangseong.data.model.VotePollDetailDto
 import com.jinyoung.sohangseong.data.model.VoteRequest
 import com.jinyoung.sohangseong.data.model.VotePollDto
 import com.jinyoung.sohangseong.data.network.MainApi
@@ -15,6 +16,10 @@ class MainRepository(
   suspend fun getPosts(): Result<List<CommunityPostDto>> = runCatching { mainApi.getPosts() }
 
   suspend fun getPolls(): Result<List<VotePollDto>> = runCatching { mainApi.getPolls() }
+
+  suspend fun getPollDetail(pollId: String): Result<VotePollDetailDto> {
+    return runCatching { mainApi.getPollDetail(pollId) }
+  }
 
   suspend fun getApprovedItems(): Result<List<ApprovedItemDto>> = runCatching { mainApi.getApprovedItems() }
 

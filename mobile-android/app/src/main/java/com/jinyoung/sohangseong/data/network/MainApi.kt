@@ -5,6 +5,7 @@ import com.jinyoung.sohangseong.data.model.CommunityPostDto
 import com.jinyoung.sohangseong.data.model.CreateCommentRequest
 import com.jinyoung.sohangseong.data.model.CreatePostRequest
 import com.jinyoung.sohangseong.data.model.UserProfileSummaryDto
+import com.jinyoung.sohangseong.data.model.VotePollDetailDto
 import com.jinyoung.sohangseong.data.model.VoteRequest
 import com.jinyoung.sohangseong.data.model.VotePollDto
 import retrofit2.http.Body
@@ -18,6 +19,11 @@ interface MainApi {
 
   @GET("standards/polls")
   suspend fun getPolls(): List<VotePollDto>
+
+  @GET("standards/polls/{pollId}")
+  suspend fun getPollDetail(
+    @Path("pollId") pollId: String
+  ): VotePollDetailDto
 
   @GET("standards/approved-items")
   suspend fun getApprovedItems(): List<ApprovedItemDto>

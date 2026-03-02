@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.jinyoung.sohangseong.data.model.ApprovedItemDto
 import com.jinyoung.sohangseong.data.model.CommunityPostDto
 import com.jinyoung.sohangseong.data.model.UserProfileSummaryDto
+import com.jinyoung.sohangseong.data.model.VotePollDetailDto
 import com.jinyoung.sohangseong.data.model.VotePollDto
 import com.jinyoung.sohangseong.data.repository.MainRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,7 @@ data class MainTabsUiState(
   val actionMessage: String? = null,
   val posts: List<CommunityPostDto> = emptyList(),
   val polls: List<VotePollDto> = emptyList(),
+  val selectedPollDetail: VotePollDetailDto? = null,
   val approvedItems: List<ApprovedItemDto> = emptyList(),
   val profileSummary: UserProfileSummaryDto? = null
 )
@@ -43,7 +45,8 @@ class MainTabsViewModel(
         selectedTab = tab,
         selectedPostId = null,
         selectedPollId = null,
-        selectedApprovedItemId = null
+        selectedApprovedItemId = null,
+        selectedPollDetail = null
       )
     }
   }
@@ -61,9 +64,11 @@ class MainTabsViewModel(
       it.copy(
         selectedTab = MainTab.STANDARDS,
         selectedPollId = pollId,
-        selectedApprovedItemId = null
+        selectedApprovedItemId = null,
+        selectedPollDetail = null
       )
     }
+    loadPollDetail(pollId)
   }
 
   fun openApprovedItemDetail(itemId: String) {
@@ -77,7 +82,7 @@ class MainTabsViewModel(
   }
 
   fun closeStandardsDetail() {
-    _state.update { it.copy(selectedPollId = null, selectedApprovedItemId = null) }
+    _state.update { it.copy(selectedPollId = null, selectedApprovedItemId = null, selectedPollDetail = null) }
   }
 
   fun refresh(userId: String) {
@@ -138,6 +143,7 @@ class MainTabsViewModel(
         .onSuccess {
           _state.update { it.copy(actionMessage = "투표가 반영되었습니다.") }
           refresh(userId)
+          loadPollDetail(pollId)
         }
         .onFailure { error ->
           _state.update {
@@ -170,6 +176,18 @@ class MainTabsViewModel(
               errorMessage = "댓글 등록 실패: ${error.message ?: "알 수 없는 오류"}"
             )
           }
+        }
+    }
+  }
+
+  private fun loadPollDetail(pollId: String) {
+    viewModelScope.launch {
+      repository.getPollDetail(pollId)
+        .onSuccess { detail ->
+          _state.update { it.copy(selectedPollDetail = detail, errorMessage = null) }
+        }
+        .onFailure { error ->
+          _state.update { it.copy(errorMessage = "투표 상세 조회 실패: ${error.message ?: "알 수 없는 오류"}") }
         }
     }
   }
