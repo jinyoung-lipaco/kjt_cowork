@@ -209,6 +209,36 @@ class MainTabsViewModel(
     }
   }
 
+  fun updateProfileNickname(userId: String, nickname: String) {
+    val trimmed = nickname.trim()
+    if (trimmed.length < 2) {
+      _state.update { it.copy(errorMessage = "닉네임은 2자 이상 입력해 주세요.") }
+      return
+    }
+    if (trimmed.length > 20) {
+      _state.update { it.copy(errorMessage = "닉네임은 20자 이하로 입력해 주세요.") }
+      return
+    }
+
+    viewModelScope.launch {
+      _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null, isOffline = false) }
+      repository.updateProfileNickname(userId = userId, nickname = trimmed)
+        .onSuccess {
+          _state.update { it.copy(actionMessage = "닉네임이 변경되었습니다.") }
+          refresh(userId)
+        }
+        .onFailure { error ->
+          _state.update {
+            it.copy(
+              loading = false,
+              errorMessage = "프로필 수정 실패: ${toUiErrorMessage(error, "알 수 없는 오류")}",
+              isOffline = isOfflineError(error)
+            )
+          }
+        }
+    }
+  }
+
   private fun loadPollDetail(pollId: String) {
     viewModelScope.launch {
       repository.getPollDetail(pollId)

@@ -6,6 +6,8 @@ import com.jinyoung.sohangseong.data.model.CommunityPostDetailDto
 import com.jinyoung.sohangseong.data.model.CommunityPostDto
 import com.jinyoung.sohangseong.data.model.CreateCommentRequest
 import com.jinyoung.sohangseong.data.model.CreatePostRequest
+import com.jinyoung.sohangseong.data.model.UpdateProfileRequest
+import com.jinyoung.sohangseong.data.model.UpdateProfileResponseDto
 import com.jinyoung.sohangseong.data.model.UserProfileSummaryDto
 import com.jinyoung.sohangseong.data.model.VotePollDetailDto
 import com.jinyoung.sohangseong.data.model.VoteRequest
@@ -35,6 +37,12 @@ class MainRepository(
 
   suspend fun getProfileSummary(userId: String): Result<UserProfileSummaryDto> {
     return runCatching { mainApi.getProfileSummary(userId) }
+  }
+
+  suspend fun updateProfileNickname(userId: String, nickname: String): Result<UpdateProfileResponseDto> {
+    return runCatching {
+      mainApi.updateProfile(userId = userId, body = UpdateProfileRequest(nickname = nickname.trim()))
+    }
   }
 
   suspend fun createPost(authorId: String, title: String, body: String): Result<CommunityPostDto> {

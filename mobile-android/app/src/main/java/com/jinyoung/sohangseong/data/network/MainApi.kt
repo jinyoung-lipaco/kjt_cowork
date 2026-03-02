@@ -6,12 +6,15 @@ import com.jinyoung.sohangseong.data.model.CommunityPostDetailDto
 import com.jinyoung.sohangseong.data.model.CommunityPostDto
 import com.jinyoung.sohangseong.data.model.CreateCommentRequest
 import com.jinyoung.sohangseong.data.model.CreatePostRequest
+import com.jinyoung.sohangseong.data.model.UpdateProfileRequest
+import com.jinyoung.sohangseong.data.model.UpdateProfileResponseDto
 import com.jinyoung.sohangseong.data.model.UserProfileSummaryDto
 import com.jinyoung.sohangseong.data.model.VotePollDetailDto
 import com.jinyoung.sohangseong.data.model.VoteRequest
 import com.jinyoung.sohangseong.data.model.VotePollDto
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -44,6 +47,12 @@ interface MainApi {
   suspend fun getProfileSummary(
     @Path("userId") userId: String
   ): UserProfileSummaryDto
+
+  @PATCH("users/{userId}/profile")
+  suspend fun updateProfile(
+    @Path("userId") userId: String,
+    @Body body: UpdateProfileRequest
+  ): UpdateProfileResponseDto
 
   @POST("posts")
   suspend fun createPost(

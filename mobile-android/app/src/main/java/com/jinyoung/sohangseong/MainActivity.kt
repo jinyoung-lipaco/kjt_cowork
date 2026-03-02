@@ -142,6 +142,9 @@ class MainActivity : ComponentActivity() {
           onVote = { pollId, optionId ->
             mainTabsViewModel.vote(savedUserId ?: "", pollId, optionId)
           },
+          onUpdateProfileNickname = { newNickname ->
+            mainTabsViewModel.updateProfileNickname(savedUserId ?: "", newNickname)
+          },
           onSignOut = {
             scope.launch {
               authRepository.signOut()

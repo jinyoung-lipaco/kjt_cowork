@@ -109,6 +109,17 @@ data class CreateCommentRequest(
   val body: String
 )
 
+data class UpdateProfileRequest(
+  val nickname: String
+)
+
+data class UpdateProfileResponseDto(
+  val id: String,
+  val nickname: String,
+  val tier: String,
+  val updatedAt: String
+)
+
 data class UserProfileStatsDto(
   val postCount: Int,
   val commentCount: Int,

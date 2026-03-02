@@ -3,6 +3,28 @@ import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
 
 export async function userRoutes(app: FastifyInstance) {
+  app.patch("/users/:userId/profile", async (request, reply) => {
+    const params = z.object({ userId: z.string().min(1) }).parse(request.params);
+    const body = z.object({ nickname: z.string().trim().min(2).max(20) }).parse(request.body);
+
+    const user = await prisma.user.findUnique({
+      where: { id: params.userId },
+      select: { id: true }
+    });
+
+    if (!user) {
+      return reply.code(404).send({ message: "사용자를 찾을 수 없습니다." });
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: params.userId },
+      data: { nickname: body.nickname },
+      select: { id: true, nickname: true, tier: true, updatedAt: true }
+    });
+
+    return updated;
+  });
+
   app.get("/users/:userId/profile-summary", async (request, reply) => {
     const params = z.object({ userId: z.string().min(1) }).parse(request.params);
 

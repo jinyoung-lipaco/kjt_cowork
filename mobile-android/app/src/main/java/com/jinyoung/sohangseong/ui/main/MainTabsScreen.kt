@@ -49,6 +49,7 @@ fun MainTabsScreen(
   onCreatePost: (title: String, body: String) -> Unit,
   onCreateComment: (postId: String, body: String) -> Unit,
   onVote: (pollId: String, optionId: String) -> Unit,
+  onUpdateProfileNickname: (String) -> Unit,
   onSignOut: () -> Unit,
   onConsumeErrorMessage: () -> Unit,
   onConsumeActionMessage: () -> Unit
@@ -153,7 +154,12 @@ fun MainTabsScreen(
           onOpenApprovedItemDetail = onOpenApprovedItemDetail,
           onCloseDetail = onCloseStandardsDetail
         )
-        MainTab.PROFILE -> ProfileTab(userId = userId, nickname = nickname, state = state)
+        MainTab.PROFILE -> ProfileTab(
+          userId = userId,
+          nickname = nickname,
+          state = state,
+          onUpdateProfileNickname = onUpdateProfileNickname
+        )
       }
     }
   }
@@ -400,8 +406,16 @@ private fun StandardsTab(
 }
 
 @Composable
-private fun ProfileTab(userId: String, nickname: String, state: MainTabsUiState) {
+private fun ProfileTab(
+  userId: String,
+  nickname: String,
+  state: MainTabsUiState,
+  onUpdateProfileNickname: (String) -> Unit
+) {
   val summary = state.profileSummary
+  var nicknameInput by remember(summary?.nickname, nickname) {
+    mutableStateOf(summary?.nickname ?: nickname)
+  }
   Card(modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Text("프로필", style = MaterialTheme.typography.titleMedium)
@@ -419,6 +433,21 @@ private fun ProfileTab(userId: String, nickname: String, state: MainTabsUiState)
       Text("닉네임: ${summary?.nickname ?: nickname}")
       Text("이메일: ${summary?.email ?: "-"}")
       Text("등급: ${summary?.tier ?: "-"}")
+      OutlinedTextField(
+        value = nicknameInput,
+        onValueChange = { nicknameInput = it },
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text("닉네임 변경") },
+        singleLine = true,
+        enabled = !state.loading
+      )
+      Button(
+        onClick = { onUpdateProfileNickname(nicknameInput) },
+        enabled = !state.loading,
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Text("닉네임 저장")
+      }
       Text("가입일: ${summary?.createdAt?.take(10) ?: "-"}")
       Text("커뮤니티 글: ${summary?.stats?.postCount ?: state.posts.size}개")
       Text("작성 댓글: ${summary?.stats?.commentCount ?: 0}개")
