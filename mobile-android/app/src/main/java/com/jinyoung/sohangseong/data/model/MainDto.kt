@@ -65,11 +65,39 @@ data class UserProfileStatsDto(
   val voteCount: Int
 )
 
+data class UserRecentPostDto(
+  val id: String,
+  val title: String,
+  val createdAt: String
+)
+
+data class UserRecentCommentDto(
+  val id: String,
+  val body: String,
+  val postId: String,
+  val createdAt: String
+)
+
+data class UserRecentVoteDto(
+  val id: String,
+  val pollId: String,
+  val pollTitle: String,
+  val optionLabel: String,
+  val createdAt: String
+)
+
+data class UserProfileActivityDto(
+  val recentPosts: List<UserRecentPostDto>,
+  val recentComments: List<UserRecentCommentDto>,
+  val recentVotes: List<UserRecentVoteDto>
+)
+
 data class UserProfileSummaryDto(
   val id: String,
   val email: String,
   val nickname: String,
   val tier: String,
   val createdAt: String,
-  val stats: UserProfileStatsDto
+  val stats: UserProfileStatsDto,
+  val activity: UserProfileActivityDto
 )

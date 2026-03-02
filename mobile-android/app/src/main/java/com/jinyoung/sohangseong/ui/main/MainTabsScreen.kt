@@ -251,10 +251,50 @@ private fun ProfileTab(userId: String, nickname: String, state: MainTabsUiState)
       Text("닉네임: ${summary?.nickname ?: nickname}")
       Text("이메일: ${summary?.email ?: "-"}")
       Text("등급: ${summary?.tier ?: "-"}")
+      Text("가입일: ${summary?.createdAt?.take(10) ?: "-"}")
       Text("커뮤니티 글: ${summary?.stats?.postCount ?: state.posts.size}개")
       Text("작성 댓글: ${summary?.stats?.commentCount ?: 0}개")
       Text("참여 투표: ${summary?.stats?.voteCount ?: 0}개")
       Text("인정템: ${state.approvedItems.size}개")
+
+      Text("최근 작성 글", style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 8.dp))
+      val recentPosts = summary?.activity?.recentPosts.orEmpty()
+      if (recentPosts.isEmpty()) {
+        Text("- 최근 글이 없습니다.", style = MaterialTheme.typography.bodySmall)
+      } else {
+        recentPosts.forEach { post ->
+          Text(
+            "• ${post.title} (${post.createdAt.take(10)})",
+            style = MaterialTheme.typography.bodySmall
+          )
+        }
+      }
+
+      Text("최근 댓글", style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 8.dp))
+      val recentComments = summary?.activity?.recentComments.orEmpty()
+      if (recentComments.isEmpty()) {
+        Text("- 최근 댓글이 없습니다.", style = MaterialTheme.typography.bodySmall)
+      } else {
+        recentComments.forEach { comment ->
+          Text(
+            "• ${comment.body} (${comment.createdAt.take(10)})",
+            style = MaterialTheme.typography.bodySmall
+          )
+        }
+      }
+
+      Text("최근 투표", style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 8.dp))
+      val recentVotes = summary?.activity?.recentVotes.orEmpty()
+      if (recentVotes.isEmpty()) {
+        Text("- 최근 투표 이력이 없습니다.", style = MaterialTheme.typography.bodySmall)
+      } else {
+        recentVotes.forEach { vote ->
+          Text(
+            "• ${vote.pollTitle} / ${vote.optionLabel} (${vote.createdAt.take(10)})",
+            style = MaterialTheme.typography.bodySmall
+          )
+        }
+      }
     }
   }
 }

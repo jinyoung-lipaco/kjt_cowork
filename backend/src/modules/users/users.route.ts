@@ -28,6 +28,42 @@ export async function userRoutes(app: FastifyInstance) {
       return reply.code(404).send({ message: "사용자를 찾을 수 없습니다." });
     }
 
+    const [recentPosts, recentComments, recentVotes] = await Promise.all([
+      prisma.post.findMany({
+        where: { authorId: params.userId },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        select: {
+          id: true,
+          title: true,
+          createdAt: true
+        }
+      }),
+      prisma.comment.findMany({
+        where: { authorId: params.userId },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        select: {
+          id: true,
+          body: true,
+          postId: true,
+          createdAt: true
+        }
+      }),
+      prisma.voteAnswer.findMany({
+        where: { userId: params.userId },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        select: {
+          id: true,
+          pollId: true,
+          createdAt: true,
+          poll: { select: { title: true } },
+          option: { select: { label: true } }
+        }
+      })
+    ]);
+
     return {
       id: user.id,
       email: user.email,
@@ -38,6 +74,17 @@ export async function userRoutes(app: FastifyInstance) {
         postCount: user._count.posts,
         commentCount: user._count.comments,
         voteCount: user._count.voteAnswers
+      },
+      activity: {
+        recentPosts,
+        recentComments,
+        recentVotes: recentVotes.map((vote) => ({
+          id: vote.id,
+          pollId: vote.pollId,
+          pollTitle: vote.poll.title,
+          optionLabel: vote.option.label,
+          createdAt: vote.createdAt
+        }))
       }
     };
   });
