@@ -20,8 +20,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
@@ -33,6 +34,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.jinyoung.sohangseong.ui.common.AppSnackbarHost
+import com.jinyoung.sohangseong.ui.common.AppSnackbarType
+import com.jinyoung.sohangseong.ui.common.AppSnackbarVisuals
 
 @Composable
 fun MainTabsScreen(
@@ -58,18 +62,34 @@ fun MainTabsScreen(
 
   LaunchedEffect(state.errorMessage) {
     val message = state.errorMessage ?: return@LaunchedEffect
-    snackbarHostState.showSnackbar(message)
+    val result = snackbarHostState.showSnackbar(
+      AppSnackbarVisuals(
+        message = message,
+        type = AppSnackbarType.ERROR,
+        actionLabel = if (state.isOffline) "재시도" else null,
+        duration = if (state.isOffline) SnackbarDuration.Long else SnackbarDuration.Short
+      )
+    )
+    if (state.isOffline && result == SnackbarResult.ActionPerformed && !state.loading) {
+      onRefresh()
+    }
     onConsumeErrorMessage()
   }
 
   LaunchedEffect(state.actionMessage) {
     val message = state.actionMessage ?: return@LaunchedEffect
-    snackbarHostState.showSnackbar(message)
+    snackbarHostState.showSnackbar(
+      AppSnackbarVisuals(
+        message = message,
+        type = AppSnackbarType.SUCCESS,
+        duration = SnackbarDuration.Short
+      )
+    )
     onConsumeActionMessage()
   }
 
   Scaffold(
-    snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+    snackbarHost = { AppSnackbarHost(hostState = snackbarHostState) },
     bottomBar = {
       NavigationBar(
         modifier = Modifier.height(84.dp)

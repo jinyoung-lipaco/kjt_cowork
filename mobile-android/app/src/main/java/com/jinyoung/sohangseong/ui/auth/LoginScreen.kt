@@ -15,8 +15,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.jinyoung.sohangseong.ui.common.AppSnackbarHost
+import com.jinyoung.sohangseong.ui.common.AppSnackbarType
+import com.jinyoung.sohangseong.ui.common.AppSnackbarVisuals
 
 @Composable
 fun LoginScreen(
@@ -43,13 +46,25 @@ fun LoginScreen(
 
   LaunchedEffect(state.errorMessage) {
     val message = state.errorMessage ?: return@LaunchedEffect
-    snackbarHostState.showSnackbar(message)
+    snackbarHostState.showSnackbar(
+      AppSnackbarVisuals(
+        message = message,
+        type = AppSnackbarType.ERROR,
+        duration = SnackbarDuration.Long
+      )
+    )
     onConsumeErrorMessage()
   }
 
   LaunchedEffect(state.infoMessage) {
     val message = state.infoMessage ?: return@LaunchedEffect
-    snackbarHostState.showSnackbar(message)
+    snackbarHostState.showSnackbar(
+      AppSnackbarVisuals(
+        message = message,
+        type = AppSnackbarType.INFO,
+        duration = SnackbarDuration.Short
+      )
+    )
     onConsumeInfoMessage()
   }
 
@@ -58,7 +73,7 @@ fun LoginScreen(
     color = MaterialTheme.colorScheme.background
   ) {
     Scaffold(
-      snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+      snackbarHost = { AppSnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
       Column(
         modifier = Modifier
