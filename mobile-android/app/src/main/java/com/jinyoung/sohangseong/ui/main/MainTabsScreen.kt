@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -80,6 +81,12 @@ fun MainTabsScreen(
           color = MaterialTheme.colorScheme.primary
         )
       }
+      if (state.loading) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+          CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.padding(top = 2.dp))
+          Text("데이터를 불러오는 중입니다.", style = MaterialTheme.typography.bodySmall)
+        }
+      }
 
       Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         Button(onClick = onRefresh) { Text("새로고침") }
@@ -145,6 +152,12 @@ private fun CommunityTab(
       }
     }
 
+    if (state.posts.isEmpty() && !state.loading) {
+      item {
+        EmptyStateCard("아직 게시글이 없습니다. 첫 글을 작성해 보세요.")
+      }
+    }
+
     items(state.posts) { post ->
       Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -154,11 +167,15 @@ private fun CommunityTab(
             text = "작성자 ${post.author.nickname} · 댓글 ${post.comments.size}개",
             style = MaterialTheme.typography.bodySmall
           )
-          post.comments.forEach { comment ->
-            Text(
-              text = "• ${comment.body}",
-              style = MaterialTheme.typography.bodySmall
-            )
+          if (post.comments.isEmpty()) {
+            Text("- 아직 댓글이 없습니다.", style = MaterialTheme.typography.bodySmall)
+          } else {
+            post.comments.forEach { comment ->
+              Text(
+                text = "• ${comment.body}",
+                style = MaterialTheme.typography.bodySmall
+              )
+            }
           }
           OutlinedTextField(
             value = commentInputs[post.id] ?: "",
@@ -190,6 +207,11 @@ private fun StandardsTab(
   LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     item {
       Text("진행 중 투표", style = MaterialTheme.typography.titleMedium)
+    }
+    if (state.polls.isEmpty() && !state.loading) {
+      item {
+        EmptyStateCard("현재 진행 중인 투표가 없습니다.")
+      }
     }
     items(state.polls) { poll ->
       Card(modifier = Modifier.fillMaxWidth()) {
@@ -223,6 +245,11 @@ private fun StandardsTab(
     item {
       Text("인정템", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 10.dp))
     }
+    if (state.approvedItems.isEmpty() && !state.loading) {
+      item {
+        EmptyStateCard("등록된 인정템이 없습니다.")
+      }
+    }
     items(state.approvedItems) { item ->
       Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -247,6 +274,16 @@ private fun ProfileTab(userId: String, nickname: String, state: MainTabsUiState)
   Card(modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Text("프로필", style = MaterialTheme.typography.titleMedium)
+
+      if (summary == null && state.loading) {
+        Text("프로필 정보를 불러오는 중입니다.", style = MaterialTheme.typography.bodySmall)
+        return@Column
+      }
+      if (summary == null && !state.loading) {
+        Text("프로필 정보를 불러오지 못했습니다. 새로고침을 눌러 다시 시도해 주세요.", style = MaterialTheme.typography.bodySmall)
+        return@Column
+      }
+
       Text("사용자 ID: ${summary?.id ?: userId}")
       Text("닉네임: ${summary?.nickname ?: nickname}")
       Text("이메일: ${summary?.email ?: "-"}")
@@ -296,5 +333,16 @@ private fun ProfileTab(userId: String, nickname: String, state: MainTabsUiState)
         }
       }
     }
+  }
+}
+
+@Composable
+private fun EmptyStateCard(message: String) {
+  Card(modifier = Modifier.fillMaxWidth()) {
+    Text(
+      text = message,
+      modifier = Modifier.padding(12.dp),
+      style = MaterialTheme.typography.bodySmall
+    )
   }
 }
