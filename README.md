@@ -18,6 +18,7 @@ npm install
 cp .env.example .env
 npm run prisma:generate
 npm run prisma:migrate
+npm run prisma:seed
 npm run dev
 ```
 
@@ -41,7 +42,6 @@ npm run dev
 - `POST /api/standards/approved-items`
 
 ## 다음 우선순위
-1. 소셜 로그인(카카오/구글) 추가
-2. 표준 투표/인정템 API 설계 및 구현
-3. 관리자 기능(신고 처리/차단) 구현
-4. Android 앱 Compose 베이스 프로젝트 생성
+1. 인증 보안 고도화(리프레시 토큰 로테이션, 로그아웃/폐기)
+2. 관리자 기능(신고 처리/차단) 구현
+3. Android 앱 Compose 베이스 프로젝트 생성
