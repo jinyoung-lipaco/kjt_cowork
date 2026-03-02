@@ -27,6 +27,8 @@ npm run dev
 ## 1차 API
 - `POST /api/auth/sign-up`
 - `POST /api/auth/sign-in`
+- `POST /api/auth/social/google`
+- `POST /api/auth/social/kakao`
 - `GET /api/posts`
 - `POST /api/posts`
 - `POST /api/posts/comments`
