@@ -1,5 +1,8 @@
 const CACHE_NAME = 'sohaengsung-v1';
-const ASSETS = ['/prototype.html', '/manifest.json'];
+const ASSETS = [
+  '/kjt_cowork/prototype.html',
+  '/kjt_cowork/manifest.json'
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
