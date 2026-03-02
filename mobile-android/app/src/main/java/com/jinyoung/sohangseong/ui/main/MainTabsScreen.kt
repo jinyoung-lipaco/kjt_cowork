@@ -436,6 +436,12 @@ private fun ProfileTab(
   var nicknameInput by remember(summary?.nickname, nickname) {
     mutableStateOf(summary?.nickname ?: nickname)
   }
+  val currentNickname = summary?.nickname ?: nickname
+  val trimmedNicknameInput = nicknameInput.trim()
+  val hasNicknameChanged = trimmedNicknameInput != currentNickname.trim()
+  val isNicknameLengthValid = trimmedNicknameInput.length in 2..20
+  val canSubmitNickname = !state.loading && hasNicknameChanged && isNicknameLengthValid
+
   Card(modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Text("프로필", style = MaterialTheme.typography.titleMedium)
@@ -459,14 +465,29 @@ private fun ProfileTab(
         modifier = Modifier.fillMaxWidth(),
         label = { Text("닉네임 변경") },
         singleLine = true,
-        enabled = !state.loading
+        enabled = !state.loading,
+        isError = nicknameInput.isNotBlank() && !isNicknameLengthValid
+      )
+      Text(
+        text = when {
+          nicknameInput.isBlank() -> "닉네임을 입력해 주세요. (2~20자)"
+          !isNicknameLengthValid -> "닉네임은 2~20자여야 합니다."
+          !hasNicknameChanged -> "변경된 내용이 없습니다."
+          else -> "저장 가능한 닉네임입니다."
+        },
+        style = MaterialTheme.typography.bodySmall,
+        color = if (nicknameInput.isNotBlank() && !isNicknameLengthValid) {
+          MaterialTheme.colorScheme.error
+        } else {
+          MaterialTheme.colorScheme.onSurfaceVariant
+        }
       )
       Button(
-        onClick = { onUpdateProfileNickname(nicknameInput) },
-        enabled = !state.loading,
+        onClick = { onUpdateProfileNickname(trimmedNicknameInput) },
+        enabled = canSubmitNickname,
         modifier = Modifier.fillMaxWidth()
       ) {
-        Text("닉네임 저장")
+        Text(if (state.loading) "저장 중..." else "닉네임 저장")
       }
       Text("가입일: ${summary?.createdAt?.take(10) ?: "-"}")
       Text("커뮤니티 글: ${summary?.stats?.postCount ?: state.posts.size}개")
