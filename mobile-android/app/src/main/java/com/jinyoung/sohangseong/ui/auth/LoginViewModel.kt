@@ -15,6 +15,7 @@ data class LoginUiState(
   val loading: Boolean = false,
   val loadingProvider: String? = null,
   val nickname: String? = null,
+  val infoMessage: String? = null,
   val errorMessage: String? = null
 )
 
@@ -25,11 +26,11 @@ class LoginViewModel(
   val state: StateFlow<LoginUiState> = _state.asStateFlow()
 
   fun onEmailChanged(value: String) {
-    _state.update { it.copy(email = value, errorMessage = null) }
+    _state.update { it.copy(email = value, errorMessage = null, infoMessage = null) }
   }
 
   fun onPasswordChanged(value: String) {
-    _state.update { it.copy(password = value, errorMessage = null) }
+    _state.update { it.copy(password = value, errorMessage = null, infoMessage = null) }
   }
 
   fun signIn() {
@@ -40,7 +41,7 @@ class LoginViewModel(
     }
 
     viewModelScope.launch {
-      _state.update { it.copy(loading = true, loadingProvider = "EMAIL", errorMessage = null) }
+      _state.update { it.copy(loading = true, loadingProvider = "EMAIL", errorMessage = null, infoMessage = null) }
       authRepository.signIn(current.email, current.password)
         .onSuccess { response ->
           _state.update {
@@ -83,14 +84,15 @@ class LoginViewModel(
     call: suspend () -> Result<com.jinyoung.sohangseong.data.model.AuthTokenResponse>
   ) {
     viewModelScope.launch {
-      _state.update { it.copy(loading = true, loadingProvider = provider, errorMessage = null) }
+      _state.update { it.copy(loading = true, loadingProvider = provider, errorMessage = null, infoMessage = null) }
       call()
         .onSuccess { response ->
           _state.update {
             it.copy(
               loading = false,
               loadingProvider = null,
-              nickname = response.user.nickname
+              nickname = response.user.nickname,
+              infoMessage = null
             )
           }
         }
@@ -107,6 +109,10 @@ class LoginViewModel(
   }
 
   fun setError(message: String) {
-    _state.update { it.copy(errorMessage = message, loading = false, loadingProvider = null) }
+    _state.update { it.copy(errorMessage = message, infoMessage = null, loading = false, loadingProvider = null) }
+  }
+
+  fun setInfo(message: String) {
+    _state.update { it.copy(infoMessage = message, errorMessage = null, loading = false, loadingProvider = null) }
   }
 }

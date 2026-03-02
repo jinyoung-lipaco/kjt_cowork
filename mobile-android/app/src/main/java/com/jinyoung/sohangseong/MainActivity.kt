@@ -21,7 +21,11 @@ import com.jinyoung.sohangseong.ui.main.MainTabsViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.launch
@@ -57,8 +61,23 @@ class MainActivity : ComponentActivity() {
             return@registerForActivityResult
           }
           viewModel.signInGoogle(idToken = idToken, nickname = account.displayName)
+        } catch (e: ApiException) {
+          when (e.statusCode) {
+            GoogleSignInStatusCodes.SIGN_IN_CANCELLED -> {
+              viewModel.setInfo("구글 로그인을 취소했어요.")
+            }
+            CommonStatusCodes.SIGN_IN_REQUIRED -> {
+              viewModel.setError("구글 계정 선택이 필요합니다.")
+            }
+            CommonStatusCodes.NETWORK_ERROR -> {
+              viewModel.setError("네트워크 문제로 구글 로그인에 실패했습니다.")
+            }
+            else -> {
+              viewModel.setError("구글 로그인 실패: ${e.localizedMessage ?: "알 수 없는 오류"}")
+            }
+          }
         } catch (e: Exception) {
-          viewModel.setError("구글 로그인 실패: ${e.message ?: "알 수 없는 오류"}")
+          viewModel.setError("구글 로그인 실패: ${e.localizedMessage ?: "알 수 없는 오류"}")
         }
       }
 
@@ -121,7 +140,11 @@ class MainActivity : ComponentActivity() {
   private fun startKakaoLogin(viewModel: LoginViewModel) {
     val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
       if (error != null) {
-        viewModel.setError("카카오 로그인 실패: ${error.message ?: "알 수 없는 오류"}")
+        if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+          viewModel.setInfo("카카오 로그인을 취소했어요.")
+        } else {
+          viewModel.setError("카카오 로그인 실패: ${error.localizedMessage ?: "알 수 없는 오류"}")
+        }
       } else if (token != null) {
         UserApiClient.instance.me { user, meError ->
           if (meError != null) {

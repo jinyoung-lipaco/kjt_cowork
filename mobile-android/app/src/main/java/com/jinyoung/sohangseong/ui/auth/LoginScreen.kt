@@ -145,6 +145,15 @@ fun LoginScreen(
           style = MaterialTheme.typography.bodySmall
         )
       }
+
+      if (state.infoMessage != null) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+          text = state.infoMessage,
+          color = MaterialTheme.colorScheme.primary,
+          style = MaterialTheme.typography.bodySmall
+        )
+      }
     }
   }
 }

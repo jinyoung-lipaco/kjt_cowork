@@ -10,6 +10,7 @@
 - 메인 탭 생성/투표 액션 API 연결 (`POST /api/posts`, `POST /api/standards/polls/:pollId/vote`)
 - 커뮤니티 댓글 작성/조회 UX 연결 (`POST /api/posts/comments`)
 - 프로필 탭 사용자 상세 API 연동 (`GET /api/users/:userId/profile-summary`)
+- 소셜 로그인 실패 UX 개선(취소/네트워크/권한 메시지 분기)
 - Access/Refresh 토큰 로컬 저장 (`DataStore`)
 - 로그아웃(토큰 삭제) 동작 연결
 
@@ -46,6 +47,6 @@
    - `starmom@sohangseong.dev` / `test1234!`
 
 ## 다음 단계
-1. 소셜 로그인 실패 케이스(취소/권한 거부) UX 개선
-2. 재발급 실패 시 로그인 화면 복귀 UX 강화
-3. 프로필 화면 가입일/활동 히스토리 영역 확장
+1. 재발급 실패 시 로그인 화면 복귀 UX 강화
+2. 프로필 화면 가입일/활동 히스토리 영역 확장
+3. 탭별 로딩/빈 상태 UI 개선
