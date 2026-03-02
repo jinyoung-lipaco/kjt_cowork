@@ -6,11 +6,16 @@ import { AuthProvider } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
 import { env } from "../../config/env.js";
+import {
+  buildAvailableNickname,
+  isNicknameTaken,
+  validateNicknamePolicy
+} from "../users/nickname.policy.js";
 
 const signUpSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  nickname: z.string().min(2).max(24)
+  nickname: z.string().min(2).max(20)
 });
 
 const signInSchema = z.object({
@@ -24,12 +29,12 @@ const refreshSchema = z.object({
 
 const googleSocialSchema = z.object({
   idToken: z.string().min(1),
-  nickname: z.string().min(2).max(24).optional()
+  nickname: z.string().min(2).max(20).optional()
 });
 
 const kakaoSocialSchema = z.object({
   accessToken: z.string().min(1),
-  nickname: z.string().min(2).max(24).optional()
+  nickname: z.string().min(2).max(20).optional()
 });
 
 const googleClient = env.GOOGLE_CLIENT_ID ? new OAuth2Client(env.GOOGLE_CLIENT_ID) : null;
@@ -69,7 +74,7 @@ async function findOrCreateSocialUser(params: {
       ? params.email.toLowerCase()
       : `${params.provider.toLowerCase()}_${params.providerUserId}@social.sohangseong.local`;
 
-  const nickname = params.nickname?.trim() || "소행성맘";
+  const nickname = await buildAvailableNickname(params.nickname, params.providerUserId);
 
   const existingByEmail = await prisma.user.findUnique({ where: { email: normalizedEmail } });
 
@@ -104,6 +109,16 @@ export async function authRoutes(app: FastifyInstance) {
     const exists = await prisma.user.findUnique({ where: { email: body.email } });
     if (exists) {
       return reply.code(409).send({ message: "이미 가입된 이메일입니다." });
+    }
+
+    const nicknameError = validateNicknamePolicy(body.nickname);
+    if (nicknameError) {
+      return reply.code(400).send({ message: nicknameError });
+    }
+
+    const nicknameTaken = await isNicknameTaken(body.nickname);
+    if (nicknameTaken) {
+      return reply.code(409).send({ message: "이미 사용 중인 닉네임입니다." });
     }
 
     const passwordHash = await bcrypt.hash(body.password, 10);

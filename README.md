@@ -32,9 +32,11 @@ npm run dev
 - `POST /api/auth/social/google`
 - `POST /api/auth/social/kakao`
 - `GET /api/posts`
+- `GET /api/posts/:postId`
 - `POST /api/posts`
 - `POST /api/posts/comments`
 - `GET /api/users/:userId/profile-summary`
+- `PATCH /api/users/:userId/profile`
 - `GET /api/standards/polls`
 - `GET /api/standards/polls/:pollId`
 - `POST /api/standards/polls`
@@ -44,6 +46,6 @@ npm run dev
 - `POST /api/standards/approved-items`
 
 ## 다음 우선순위
-1. 인증 보안 고도화(리프레시 토큰 로테이션, 로그아웃/폐기)
-2. 관리자 기능(신고 처리/차단) 구현
-3. Android 앱 Compose 베이스 프로젝트 생성
+1. 닉네임 정책 고도화(금칙어 사전 확장/관리 도구)
+2. 인증 보안 고도화(리프레시 토큰 로테이션, 로그아웃/폐기)
+3. 관리자 기능(신고 처리/차단) 구현

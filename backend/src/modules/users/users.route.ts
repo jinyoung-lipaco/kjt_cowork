@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
+import { isNicknameTaken, validateNicknamePolicy } from "./nickname.policy.js";
 
 export async function userRoutes(app: FastifyInstance) {
   app.patch("/users/:userId/profile", async (request, reply) => {
@@ -14,6 +15,16 @@ export async function userRoutes(app: FastifyInstance) {
 
     if (!user) {
       return reply.code(404).send({ message: "사용자를 찾을 수 없습니다." });
+    }
+
+    const nicknameError = validateNicknamePolicy(body.nickname);
+    if (nicknameError) {
+      return reply.code(400).send({ message: nicknameError });
+    }
+
+    const nicknameTaken = await isNicknameTaken(body.nickname, params.userId);
+    if (nicknameTaken) {
+      return reply.code(409).send({ message: "이미 사용 중인 닉네임입니다." });
     }
 
     const updated = await prisma.user.update({
