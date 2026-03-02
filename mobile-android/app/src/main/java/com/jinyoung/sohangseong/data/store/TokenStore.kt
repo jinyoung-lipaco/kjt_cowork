@@ -106,4 +106,10 @@ class TokenStore(private val context: Context) {
       prefs[refreshTokenKey] = refreshToken
     }
   }
+
+  suspend fun updateNickname(nickname: String) {
+    context.authDataStore.edit { prefs: MutablePreferences ->
+      prefs[userNicknameKey] = nickname
+    }
+  }
 }

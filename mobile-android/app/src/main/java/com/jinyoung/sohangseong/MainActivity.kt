@@ -122,6 +122,12 @@ class MainActivity : ComponentActivity() {
         LaunchedEffect(savedUserId, savedNickname) {
           mainTabsViewModel.refresh(savedUserId ?: "")
         }
+        LaunchedEffect(mainTabsState.profileSummary?.nickname, savedNickname) {
+          val profileNickname = mainTabsState.profileSummary?.nickname
+          if (!profileNickname.isNullOrBlank() && profileNickname != savedNickname) {
+            tokenStore.updateNickname(profileNickname)
+          }
+        }
         MainTabsScreen(
           state = mainTabsState,
           userId = savedUserId ?: "",
