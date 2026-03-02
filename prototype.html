@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>엄마의우주 — 인터랙티브 프로토타입</title>
+<title>소행성 — 인터랙티브 프로토타입</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#A87750">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
 
@@ -6649,6 +6652,11 @@ document.addEventListener('click', function(e){
   var name = nameEl.textContent.trim().split(' ')[0]; // "서연맘 인기" → "서연맘"
   openProfilePopup(name);
 });
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').catch(function(){});
+}
 </script>
 </body>
 </html>

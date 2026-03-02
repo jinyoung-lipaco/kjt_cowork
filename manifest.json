@@ -1,0 +1,24 @@
+{
+  "name": "소행성 - 엄마들의 육아 커뮤니티",
+  "short_name": "소행성",
+  "description": "엄마들이 함께 만들어가는 육아 제품 커뮤니티",
+  "start_url": "/prototype.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAF7F4",
+  "theme_color": "#A87750",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
