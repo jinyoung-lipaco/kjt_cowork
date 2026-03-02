@@ -2,6 +2,7 @@ package com.jinyoung.sohangseong.data.network
 
 import com.jinyoung.sohangseong.data.model.ApprovedItemDto
 import com.jinyoung.sohangseong.data.model.CommunityPostDto
+import com.jinyoung.sohangseong.data.model.CreateCommentRequest
 import com.jinyoung.sohangseong.data.model.CreatePostRequest
 import com.jinyoung.sohangseong.data.model.VoteRequest
 import com.jinyoung.sohangseong.data.model.VotePollDto
@@ -24,6 +25,11 @@ interface MainApi {
   suspend fun createPost(
     @Body body: CreatePostRequest
   ): CommunityPostDto
+
+  @POST("posts/comments")
+  suspend fun createComment(
+    @Body body: CreateCommentRequest
+  ): Map<String, String>
 
   @POST("standards/polls/{pollId}/vote")
   suspend fun votePoll(

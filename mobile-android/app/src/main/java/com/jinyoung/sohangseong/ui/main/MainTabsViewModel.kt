@@ -106,4 +106,28 @@ class MainTabsViewModel(
         }
     }
   }
+
+  fun createComment(userId: String, postId: String, body: String) {
+    if (body.isBlank()) {
+      _state.update { it.copy(errorMessage = "댓글 내용을 입력해 주세요.") }
+      return
+    }
+
+    viewModelScope.launch {
+      _state.update { it.copy(loading = true, errorMessage = null, actionMessage = null) }
+      repository.createComment(userId = userId, postId = postId, body = body)
+        .onSuccess {
+          _state.update { it.copy(actionMessage = "댓글이 등록되었습니다.") }
+          refresh()
+        }
+        .onFailure { error ->
+          _state.update {
+            it.copy(
+              loading = false,
+              errorMessage = "댓글 등록 실패: ${error.message ?: "알 수 없는 오류"}"
+            )
+          }
+        }
+    }
+  }
 }

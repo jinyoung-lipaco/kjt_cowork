@@ -102,6 +102,9 @@ class MainActivity : ComponentActivity() {
           onCreatePost = { title, body ->
             mainTabsViewModel.createPost(savedUserId ?: "", title, body)
           },
+          onCreateComment = { postId, body ->
+            mainTabsViewModel.createComment(savedUserId ?: "", postId, body)
+          },
           onVote = { pollId, optionId ->
             mainTabsViewModel.vote(savedUserId ?: "", pollId, optionId)
           },

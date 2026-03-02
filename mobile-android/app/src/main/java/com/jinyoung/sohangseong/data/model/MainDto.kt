@@ -52,3 +52,9 @@ data class VoteRequest(
   val userId: String,
   val optionId: String
 )
+
+data class CreateCommentRequest(
+  val postId: String,
+  val authorId: String,
+  val body: String
+)

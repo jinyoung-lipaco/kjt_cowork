@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -32,6 +33,7 @@ fun MainTabsScreen(
   onSelectTab: (MainTab) -> Unit,
   onRefresh: () -> Unit,
   onCreatePost: (title: String, body: String) -> Unit,
+  onCreateComment: (postId: String, body: String) -> Unit,
   onVote: (pollId: String, optionId: String) -> Unit,
   onSignOut: () -> Unit
 ) {
@@ -87,7 +89,8 @@ fun MainTabsScreen(
       when (state.selectedTab) {
         MainTab.COMMUNITY -> CommunityTab(
           state = state,
-          onCreatePost = { title, body -> onCreatePost(title, body) }
+          onCreatePost = { title, body -> onCreatePost(title, body) },
+          onCreateComment = onCreateComment
         )
         MainTab.STANDARDS -> StandardsTab(
           state = state,
@@ -102,10 +105,12 @@ fun MainTabsScreen(
 @Composable
 private fun CommunityTab(
   state: MainTabsUiState,
-  onCreatePost: (title: String, body: String) -> Unit
+  onCreatePost: (title: String, body: String) -> Unit,
+  onCreateComment: (postId: String, body: String) -> Unit
 ) {
   var title by remember { mutableStateOf("") }
   var body by remember { mutableStateOf("") }
+  val commentInputs = remember { mutableStateMapOf<String, String>() }
 
   LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     item {
@@ -149,6 +154,28 @@ private fun CommunityTab(
             text = "작성자 ${post.author.nickname} · 댓글 ${post.comments.size}개",
             style = MaterialTheme.typography.bodySmall
           )
+          post.comments.forEach { comment ->
+            Text(
+              text = "• ${comment.body}",
+              style = MaterialTheme.typography.bodySmall
+            )
+          }
+          OutlinedTextField(
+            value = commentInputs[post.id] ?: "",
+            onValueChange = { commentInputs[post.id] = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("댓글 작성") }
+          )
+          Button(
+            onClick = {
+              onCreateComment(post.id, commentInputs[post.id] ?: "")
+              commentInputs[post.id] = ""
+            },
+            enabled = !state.loading,
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Text("댓글 등록")
+          }
         }
       }
     }

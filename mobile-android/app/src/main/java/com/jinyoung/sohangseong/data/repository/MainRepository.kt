@@ -2,6 +2,7 @@ package com.jinyoung.sohangseong.data.repository
 
 import com.jinyoung.sohangseong.data.model.ApprovedItemDto
 import com.jinyoung.sohangseong.data.model.CommunityPostDto
+import com.jinyoung.sohangseong.data.model.CreateCommentRequest
 import com.jinyoung.sohangseong.data.model.CreatePostRequest
 import com.jinyoung.sohangseong.data.model.VoteRequest
 import com.jinyoung.sohangseong.data.model.VotePollDto
@@ -33,6 +34,19 @@ class MainRepository(
       mainApi.votePoll(
         pollId = pollId,
         body = VoteRequest(userId = userId, optionId = optionId)
+      )
+      Unit
+    }
+  }
+
+  suspend fun createComment(userId: String, postId: String, body: String): Result<Unit> {
+    return runCatching {
+      mainApi.createComment(
+        CreateCommentRequest(
+          postId = postId,
+          authorId = userId,
+          body = body.trim()
+        )
       )
       Unit
     }
