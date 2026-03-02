@@ -33,5 +33,14 @@ services:
     ports:
       - "4000:4000"
 
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: sohangseong-tunnel
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    command: tunnel --no-autoupdate --url http://backend:4000
+
 volumes:
   pg_data:

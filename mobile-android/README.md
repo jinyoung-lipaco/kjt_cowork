@@ -66,6 +66,19 @@
 3. 산출물:
    - `app/build/outputs/apk/release/app-release.apk`
 
+## 외부 네트워크(친구 원격 테스트)
+1. 터널 포함 서버 실행:
+   - `cd /Users/elbert.kim/Desktop/kjt_cowork`
+   - `docker compose up -d --build`
+2. 공개 URL 확인:
+   - `docker compose logs tunnel --tail=50`
+   - `https://<random>.trycloudflare.com` 주소 확인
+3. 해당 URL로 APK 다시 빌드:
+   - `cd /Users/elbert.kim/Desktop/kjt_cowork/mobile-android`
+   - `./gradlew :app:assembleRelease -PAPI_BASE_URL=https://<random>.trycloudflare.com/api/`
+4. 친구에게 전달할 파일:
+   - `app/build/outputs/apk/release/app-release.apk`
+
 ## 다음 단계
 1. 스낵바 액션 패턴 삭제 플로우로 확장(게시글/댓글)
 2. 프로필 관심 카테고리 선택 UI 칩화

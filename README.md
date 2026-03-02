@@ -33,6 +33,16 @@ docker compose up -d --build
 - 앱에서 사용할 API URL 예시: `http://<PC_IP_OR_DOMAIN>:4000/api/`
 - 외부 네트워크 테스트 시 공유기/방화벽에서 `4000` 포트 개방이 필요합니다.
 
+## 외부 네트워크 테스트(같은 와이파이 아님)
+
+- Cloudflare Quick Tunnel을 Docker로 함께 실행하도록 구성되어 있습니다.
+- 공개 HTTPS 주소 확인:
+  - `docker compose logs tunnel --tail=50`
+  - 로그의 `https://<random>.trycloudflare.com` 주소를 사용
+- 친구용 APK 빌드:
+  - `cd /Users/elbert.kim/Desktop/kjt_cowork/mobile-android`
+  - `./gradlew :app:assembleRelease -PAPI_BASE_URL=https://<random>.trycloudflare.com/api/`
+
 기본 헬스체크:
 - `GET http://localhost:4000/api/health`
 
